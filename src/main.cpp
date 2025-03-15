@@ -1,124 +1,117 @@
 #include <Arduino.h>
+#include <LiquidCrystal_I2C.h>
+#include <Wire.h>
 
-struct __emit_num_values {
-  uint8_t leds[7];
-  uint8_t led_count;
-};
+#include "RTClib.h"
 
-struct __emit_obj {
-  uint8_t a;
+#define LED_R_PIN 11
+#define LED_G_PIN 10
+#define LED_B_PIN 9
+
+#define BTN_A 6
+#define BTN_B 5
+#define BTN_C 4
+#define TOUCH_SENSOR 2  // A push button e.g.
+#define BUZZER 3
+
+#define COLOR_COMBI_COUNT 6
+struct RGB_COMBI_t {
+  uint8_t r;
+  uint8_t g;
   uint8_t b;
 };
 
-// HIGH-LOW
-__emit_obj OBJ[3][7] = {
-    // Need to fill some so with empty (0, 1) so we can normally use anything.
-    {{0, 1}, {0, 1}, {1, 2}, {1, 3}, {0, 1}, {0, 1}, {0, 1}},
+RGB_COMBI_t color_combi[COLOR_COMBI_COUNT] = {{255, 0, 0},     {0, 255, 0},
+                                              {0, 0, 255},     {255, 200, 150},
+                                              {255, 255, 255}, {127, 127, 127}};
+uint8_t current_color = 0;  // Index 0 - 6
 
-    // This (2, 3) are replace by (0, 1) since (2, 3) are damaged
-    {{2, 0}, {0, 1}, {3, 2}, {2, 1}, {3, 1}, {3, 0}, {1, 0}},
-    {{4, 1}, {3, 4}, {4, 3}, {2, 4}, {4, 2}, {1, 4}, {4, 0}}};
-
-__emit_num_values num_combo[10] = {
-    {{0, 1, 2, 3, 4, 5}, 6}, {{2, 3}, 2},       {{1, 2, 4, 5, 6}, 5},
-    {{1, 2, 3, 4, 6}, 5},    {{0, 2, 3, 6}, 4}, {{0, 1, 3, 4, 6}, 5},
-    {{0, 1, 3, 4, 5, 6}, 6}, {{1, 2, 3}, 3},    {{0, 1, 2, 3, 4, 5, 6}, 7},
-    {{0, 1, 2, 3, 4, 6}, 6}};
-
-int sx = 5;
-int sy = 10;
-
-uint8_t pins[5] = {8, 9, 10, 11, 12};
-
-void reset_leds() {
-  for (int i = 0; i < 5; i++) pinMode(pins[i], INPUT);
-}
-
-void combo(uint8_t a, uint8_t b) {
-  a = pins[a];
-  b = pins[b];
-
-  pinMode(a, OUTPUT);
-  pinMode(b, OUTPUT);
-
-  delay(0);
-
-  // Need everything to set to low so
-  // We not disturb other leds
-  digitalWrite(b, LOW);
-  digitalWrite(a, LOW);
-  digitalWrite(b, HIGH);
-}
-
-void emit_led(uint8_t seg, uint8_t index) {
-  reset_leds();
-
-  seg = seg % 3;
-
-  index %= 7;
-
-  __emit_obj res = OBJ[seg][index];
-
-  combo(res.a, res.b);
-}
-
-void emit_num(uint8_t seg, uint8_t num) {
-  if (seg == 0) {
-    if (num != 1) return;
+class Button {
+ public:
+  uint8_t pin;
+  Button(uint8_t _pin) {
+    pin = _pin;
+    pinMode(pin, INPUT_PULLUP);
   }
 
-  __emit_num_values res_num = num_combo[num];
+  bool is_high() {
+    if (digitalRead(pin) == LOW) {
+      if (flag) {
+        flag = false;
 
-  for (int i = 0; i < res_num.led_count; i++) {
-    uint8_t n = res_num.leds[i];
-
-    emit_led(seg, n);
-
-    delay(0);
-  }
-}
-
-/**
- * Being used to map leds
- *
- */
-void handle_serial() {
-  if (Serial.available() > 0) {
-    String inputString = Serial.readStringUntil('\n');
-    inputString.trim();
-
-    if (inputString.length() == 2 &&
-        (inputString[0] >= '0' && inputString[0] <= '9') &&
-        (inputString[1] >= '0' && inputString[1] <= '9')) {
-      int tensDigit = inputString[0] - '0';  // Convert char to int
-      int onesDigit = inputString[1] - '0';  // Convert char to int
-
-      Serial.print("Tens digit: ");
-      Serial.println(tensDigit);
-      Serial.print("Ones digit: ");
-      Serial.println(onesDigit);
-
-      sx = tensDigit;
-      sy = onesDigit;
+        return true;
+      }
     } else {
-      Serial.println("Invalid input. Please enter a two-digit number.");
+      flag = true;
     }
+
+    return false;
   }
+
+ private:
+  bool flag = true;
+};
+
+RTC_DS1307 rtc;
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+Button touch = Button(TOUCH_SENSOR);
+Button btn_a = Button(BTN_A);
+Button btn_b = Button(BTN_B);
+Button btn_c = Button(BTN_C);
+
+void emit_rgb(RGB_COMBI_t rgb) {
+  analogWrite(LED_R_PIN, rgb.r);
+  analogWrite(LED_G_PIN, rgb.g);
+  analogWrite(LED_B_PIN, rgb.b);
 }
 
 void setup() {
   Serial.begin(9600);
+  Wire.begin();
+  rtc.begin();
 
-  while (!Serial) {
-    /* code */
+  while (!Serial);
+
+  lcd.init();
+  lcd.backlight();
+
+  if (!rtc.isrunning()) {
+    Serial.println("RTC is NOT running!");
+
+    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
   }
+
+  pinMode(LED_R_PIN, OUTPUT);
+  pinMode(LED_G_PIN, OUTPUT);
+  pinMode(LED_B_PIN, OUTPUT);
+
+  pinMode(TOUCH_SENSOR, INPUT_PULLUP);
 }
 
 void loop() {
-  uint8_t count = (millis() / 3600000) % 100;
-  // handle_serial();
-  // combo(sx, sy);
-  emit_num(0, (count / 100) % 10);
-  emit_num(1, (count / 10) % 10);
-  emit_num(2, count % 10);
+  if (touch.is_high()) {
+    digitalWrite(LED_R_PIN, HIGH);
+  } else {
+    digitalWrite(LED_R_PIN, LOW);
+  }
+
+  // DateTime now = rtc.now();
+
+  // lcd.clear();
+  // lcd.setCursor(0, 0);
+  // lcd.print("Time: ");
+  // lcd.print(now.hour(), DEC);
+  // lcd.print(':');
+  // lcd.print(now.minute(), DEC);
+  // lcd.print(':');
+  // lcd.print(now.second(), DEC);
+
+  // lcd.setCursor(0, 1);
+  // lcd.print("Date: ");
+  // lcd.print(now.day(), DEC);
+  // lcd.print('/');
+  // lcd.print(now.month(), DEC);
+  // lcd.print('/');
+  // lcd.print(now.year(), DEC);
 }
