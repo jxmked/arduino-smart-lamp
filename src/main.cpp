@@ -24,15 +24,54 @@ struct RGB_COMBI_t {
 RGB_COMBI_t color_combi[COLOR_COMBI_COUNT] = {{255, 0, 0},     {0, 255, 0},
                                               {0, 0, 255},     {255, 200, 150},
                                               {255, 255, 255}, {127, 127, 127}};
-uint8_t current_color = 0;  // Index 0 - 6
+uint8_t current_color = COLOR_COMBI_COUNT;  // Index 0 - 6; 6 = off
+
+class TimeInterval {
+ public:
+  TimeInterval(unsigned long _interval, unsigned long _offset = 0,
+               bool _autoUpdate = false) {
+    interval = _interval;
+    offset = _offset;
+    autoUpdate = _autoUpdate;
+  }
+
+  void update() {
+    time = millis() + offset;
+
+    if (paused) lastTime = time;
+  }
+
+  bool marked(unsigned long holdMillis = 0) {
+    if (autoUpdate) update();
+
+    const auto currentTime = time;
+    const unsigned long diff = currentTime - lastTime;
+
+    if (diff >= interval) {
+      if (diff - interval >= holdMillis) lastTime = currentTime;
+      return true;
+    }
+
+    return false;
+  }
+
+  void pause() { paused = true; }
+  void resume() { paused = true; }
+
+ private:
+  unsigned long interval = 0;
+  bool autoUpdate = false;
+  unsigned long lastTime = 0;
+  unsigned long time = 0;
+  unsigned long offset = 0;
+  bool paused = false;
+};
 
 class Button {
  public:
-  uint8_t pin;
-  Button(uint8_t _pin) {
-    pin = _pin;
-    pinMode(pin, INPUT_PULLUP);
-  }
+  Button(uint8_t _pin) { pin = _pin; }
+
+  void init() { pinMode(pin, INPUT_PULLUP); }
 
   bool is_high() {
     if (digitalRead(pin) == LOW) {
@@ -50,6 +89,7 @@ class Button {
 
  private:
   bool flag = true;
+  uint8_t pin;
 };
 
 RTC_DS1307 rtc;
@@ -60,7 +100,21 @@ Button btn_a = Button(BTN_A);
 Button btn_b = Button(BTN_B);
 Button btn_c = Button(BTN_C);
 
-void emit_rgb(RGB_COMBI_t rgb) {
+void change_rgb_state() {
+  current_color++;
+
+  RGB_COMBI_t rgb;
+
+  if (current_color > COLOR_COMBI_COUNT) {
+    current_color = 0;
+  }
+
+  if (current_color < COLOR_COMBI_COUNT) {
+    rgb = color_combi[current_color];
+  } else {
+    rgb = {0, 0, 0};
+  }
+
   analogWrite(LED_R_PIN, rgb.r);
   analogWrite(LED_G_PIN, rgb.g);
   analogWrite(LED_B_PIN, rgb.b);
@@ -86,32 +140,14 @@ void setup() {
   pinMode(LED_G_PIN, OUTPUT);
   pinMode(LED_B_PIN, OUTPUT);
 
-  pinMode(TOUCH_SENSOR, INPUT_PULLUP);
-}
+  touch.init();
+  btn_a.init();
+  btn_b.init();
+  btn_c.init();
+};
 
 void loop() {
   if (touch.is_high()) {
-    digitalWrite(LED_R_PIN, HIGH);
-  } else {
-    digitalWrite(LED_R_PIN, LOW);
+    change_rgb_state();
   }
-
-  // DateTime now = rtc.now();
-
-  // lcd.clear();
-  // lcd.setCursor(0, 0);
-  // lcd.print("Time: ");
-  // lcd.print(now.hour(), DEC);
-  // lcd.print(':');
-  // lcd.print(now.minute(), DEC);
-  // lcd.print(':');
-  // lcd.print(now.second(), DEC);
-
-  // lcd.setCursor(0, 1);
-  // lcd.print("Date: ");
-  // lcd.print(now.day(), DEC);
-  // lcd.print('/');
-  // lcd.print(now.month(), DEC);
-  // lcd.print('/');
-  // lcd.print(now.year(), DEC);
 }

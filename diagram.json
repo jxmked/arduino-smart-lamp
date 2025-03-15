@@ -10,7 +10,7 @@
       "top": -0.1,
       "left": 89.9,
       "rotate": 90,
-      "attrs": { "color": "yellow", "xray": "1", "bounce": "1" }
+      "attrs": { "color": "yellow", "xray": "1", "bounce": "0" }
     },
     {
       "type": "wokwi-pushbutton",
@@ -18,7 +18,7 @@
       "top": -0.1,
       "left": 157.1,
       "rotate": 90,
-      "attrs": { "color": "red", "xray": "1" }
+      "attrs": { "color": "red", "xray": "1", "bounce": "0" }
     },
     {
       "type": "wokwi-pushbutton",
@@ -26,7 +26,7 @@
       "top": -0.1,
       "left": 224.3,
       "rotate": 90,
-      "attrs": { "color": "yellow", "xray": "1" }
+      "attrs": { "color": "yellow", "xray": "1", "bounce": "0" }
     },
     {
       "type": "wokwi-rgb-led",
@@ -48,7 +48,7 @@
       "id": "btn4",
       "top": 83,
       "left": 278.4,
-      "attrs": { "color": "grey", "xray": "" }
+      "attrs": { "color": "grey", "xray": "", "bounce": "0" }
     },
     {
       "type": "wokwi-buzzer",
