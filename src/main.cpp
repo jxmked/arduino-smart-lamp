@@ -1,34 +1,28 @@
 #include <Arduino.h>
-#include <Wire.h>
+#include <TM1637.h>
 
-#include "Button.h"
-#include "RTClib.h"
 #include "config.h"
 
-RTC_DS1307 rtc;
-
-Button touch = Button(TOUCH_SENSOR);
-Button btn_a = Button(BTN_A);
-Button btn_b = Button(BTN_B);
-Button btn_c = Button(BTN_C);
+TM1637 tm(SEVEN_SEGMENT_CLK_PIN, SEVEN_SEGMENT_DIO_PIN);
 
 void setup() {
-  Serial.begin(9600);
-  Wire.begin();
-  rtc.begin();
+  tm.init();
 
-  while (!Serial);
+  tm.setBrightnessPercent(100);
+}
 
-  if (!rtc.isrunning()) {
-    Serial.println("RTC is NOT running!");
+unsigned int counter = 0;
 
-    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+void loop() {
+  // tm.display(0, (counter / 1000) % 10);
+  // tm.display(1, (counter / 100) % 10);
+  // tm.display(2, (counter / 10) % 10);
+  tm.display(counter, false, false, 0);
+
+  counter++;
+  if (counter == 10000) {
+    counter = 0;
   }
 
-  touch.begin();
-  btn_a.begin();
-  btn_b.begin();
-  btn_c.begin();
-};
-
-void loop() {}
+  delay(100);
+}

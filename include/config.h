@@ -1,8 +1,8 @@
 #ifndef CONFIG_h
 #define CONFIG_h
 
-#define SEVEN_SEGMENT_DIO_PIN 13
-#define SEVEN_SEGMENT_CLK_PIN 12
+#define SEVEN_SEGMENT_DIO_PIN 12
+#define SEVEN_SEGMENT_CLK_PIN 13
 
 #define LAMP_LED_PIN 8
 
