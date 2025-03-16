@@ -14,6 +14,10 @@ void setup() {
 unsigned int counter = 0;
 
 void loop() {
+
+
+
+  
   // tm.display(0, (counter / 1000) % 10);
   // tm.display(1, (counter / 100) % 10);
   // tm.display(2, (counter / 10) % 10);
