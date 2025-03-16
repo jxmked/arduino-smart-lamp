@@ -2,32 +2,37 @@
 #include <TM1637.h>
 
 #include "config.h"
+#include "display/display.h"
 #include "types.h"
-
-TM1637 tm(SEVEN_SEGMENT_CLK_PIN, SEVEN_SEGMENT_DIO_PIN);
 
 TIME_t time;
 
+Display display;
+
 void setup() {
-  tm.init();
+  display.begin();
 
-  TIME_t &data = time;
-
-  tm.setBrightnessPercent(100);
+  time.second = 0;
+  time.minute = 19;
+  time.hour = 4;
 }
 
-unsigned int counter = 0;
-
 void loop() {
-  // tm.display(0, (counter / 1000) % 10);
-  // tm.display(1, (counter / 100) % 10);
-  // tm.display(2, (counter / 10) % 10);
-  tm.display(counter, true, false, 0);
+  auto ms = (millis() / 1000) % 60;
 
-  counter++;
-  if (counter == 10000) {
-    counter = 0;
+  if (ms != time.second) {
+    if (time.second == 59) {
+      if (time.minute == 59) {
+        time.hour = (time.hour++) % 24;
+      }
+
+      time.minute = (time.minute++) % 60;
+    }
+
+    time.second = ms;
   }
+
+  display.display_time(time);
 
   delay(100);
 }

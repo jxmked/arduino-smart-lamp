@@ -51,7 +51,7 @@
       "left": -271.37,
       "attrs": { "color": "red" }
     },
-    { "type": "wokwi-led", "id": "led2", "top": 25.2, "left": 42.2, "attrs": { "color": "red" } },
+    { "type": "wokwi-led", "id": "led2", "top": 6, "left": 32.6, "attrs": { "color": "red" } },
     {
       "type": "wokwi-text",
       "id": "text1",
@@ -76,22 +76,22 @@
     {
       "type": "wokwi-text",
       "id": "text4",
-      "top": -48,
+      "top": -86.4,
       "left": 163.2,
-      "attrs": { "text": "Set Buttons" }
+      "attrs": { "text": "Button" }
     },
     {
       "type": "wokwi-text",
       "id": "text5",
-      "top": 9.6,
-      "left": -9.6,
+      "top": -9.6,
+      "left": -28.8,
       "attrs": { "text": "Lamp Leds" }
     },
     {
       "type": "wokwi-text",
       "id": "text6",
-      "top": 67.2,
-      "left": -316.8,
+      "top": 19.2,
+      "left": -297.6,
       "attrs": { "text": "4-digit Seven segment with colon" }
     },
     {
@@ -100,6 +100,27 @@
       "top": 384,
       "left": 268.8,
       "attrs": { "text": "RTC Real Time Clock" }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "text8",
+      "top": -48,
+      "left": 240,
+      "attrs": { "text": "Minute" }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "text9",
+      "top": -48,
+      "left": 105.6,
+      "attrs": { "text": "Hour" }
+    },
+    {
+      "type": "wokwi-text",
+      "id": "text10",
+      "top": -48,
+      "left": 172.8,
+      "attrs": { "text": "Set" }
     }
   ],
   "connections": [
@@ -118,13 +139,13 @@
     [ "rtc1:GND", "uno:GND.3", "black", [ "h-28.8", "v57.6", "h-105.6" ] ],
     [ "btn1:1.r", "uno:GND.1", "black", [ "v19.4", "h-48" ] ],
     [ "led1:C", "uno:GND.1", "black", [ "h0.4", "v28.8", "h28.5" ] ],
-    [ "led1:A", "uno:8", "red", [ "v9.6", "h76.8", "v28.8", "h28.4" ] ],
+    [ "led1:A", "uno:8", "red", [ "v9.6", "h96", "v28.8", "h9.2" ] ],
     [ "sevseg1:GND", "uno:GND.3", "black", [ "h0", "v192", "h268.8" ] ],
     [ "sevseg1:VCC", "uno:5V", "red", [ "h19.2", "v172.8", "h226.6" ] ],
-    [ "sevseg1:CLK", "uno:A5", "blue", [ "h48", "v201.6", "h293.3" ] ],
     [ "sevseg1:DIO", "uno:12", "gold", [ "h28.8", "v-38.4", "h192" ] ],
     [ "led2:A", "led1:A", "red", [ "v0" ] ],
-    [ "led1:C", "led2:C", "black", [ "v-9.6", "h10", "v-38.4" ] ]
+    [ "led2:C", "led1:C", "black", [ "v38.4", "h-19.2" ] ],
+    [ "sevseg1:CLK", "uno:13", "green", [ "h57.6", "v-19.2", "h134.4" ] ]
   ],
   "dependencies": {}
 }

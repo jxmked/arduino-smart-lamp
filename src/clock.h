@@ -8,6 +8,7 @@
 
 class Clock {
  public:
+  Clock();
   void begin();
   void update(TIME_t* time);
 

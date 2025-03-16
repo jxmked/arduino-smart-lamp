@@ -7,6 +7,6 @@
 
 Clock::Clock() : rtc() {}
 
-void Clock::begin() {
-  
-}
+void Clock::begin() {}
+
+void Clock::update(TIME_t* time) {}
