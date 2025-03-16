@@ -42,6 +42,7 @@ class D_5641AS {
   void disable();
   void set_signal(bool sig);
   void emit(uint8_t feed);
+  void emit_num(uint16_t feed);
 
  private:
   D_5641AS_PINS pins;

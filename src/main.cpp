@@ -63,18 +63,29 @@ void setup() {
 }
 
 void loop() {
-  for (int digit = 0x0; digit < 0x4; digit++) {
-    for (int count = 0; count < 8; count++) {
-      uint8_t bin = count << 3;
+  // for (uint16_t i = 0; i < 10; i++) {
+  //   int x = 0;
+  //   while (x < 1000) driver.emit_num(i);
 
-      bin |= (digit | 0x4);
+  //   delay(5000);
+  // }
+  driver.emit_num(1);
 
-      driver.enable();
-      driver.emit(bin);
+  // delay(5000);
 
-      delay(500);
+  // for (int digit = 0x0; digit < 0x4; digit++) {
+  //   for (int count = 0; count < 8; count++) {
+  //     uint8_t bin = count << 3;
 
-      driver.set_signal(false);
-    }
-  }
+  //     bin |= (digit | 0x4);
+
+  //     driver.enable();
+  //     driver.emit(bin);
+
+  //     delay(500);
+
+  //     driver.set_signal(false);
+  //     driver.disable();
+  //   }
+  // }
 }
