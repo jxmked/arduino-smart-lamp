@@ -33,7 +33,7 @@ void setup() {
     display.display_err();
     abort();
   }
-
+  
   touch_lamp.begin();
   lamp.update();
 }
