@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <TM1637.h>
+#include <Wire.h>
 
 #include "TimeInterval.h"
 #include "clock.h"
@@ -15,29 +16,23 @@ Display display;
 Clock clock;
 
 void setup() {
+  Serial.begin(9600);
+
+  while (!Serial);
+
   display.begin();
   clock.begin();
 
-  // if (!clock.ready_to_start) {
-  //   display.display_err();
-  //   abort();
-  // }
+  if (!clock.ready_to_start) {
+    display.display_err();
+    abort();
+  }
 }
 
 void loop() {
-  // clock.update(&time);
-
-  if (timer.marked()) {
-    time.minute++;
-
-    if (time.minute > 59) {
-      time.hour = (time.hour + 1) % 24;
-      time.minute = 0;
-    }
-  }
+  clock.update(&time);
 
   display.display_time(time);
 
-  // display.display_err();
-  // delay(250);
+  delay(250);
 }

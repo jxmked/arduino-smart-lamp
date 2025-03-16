@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <TM1637.h>
 
 #include "types.h"
 
@@ -8,11 +9,11 @@ class Display {
  public:
   Display();
   void begin();
-  void display_time(TIME_t _time);
+  void display_time(TIME_t time);
   void display_err();
 
   ColonState colon;
 
-  //  private:
-  //   // TIME_t time;
+ private:
+  TM1637 tm;
 };

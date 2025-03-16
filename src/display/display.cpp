@@ -6,9 +6,9 @@
 #include "config.h"
 #include "types.h"
 
-TM1637 tm(SEVEN_SEGMENT_CLK_PIN, SEVEN_SEGMENT_DIO_PIN);
-
-Display::Display() : colon(ColonState::ACTIVE) {}
+Display::Display()
+    : colon(ColonState::ACTIVE),
+      tm(SEVEN_SEGMENT_CLK_PIN, SEVEN_SEGMENT_DIO_PIN) {}
 
 void Display::begin() {
   tm.init();
@@ -27,7 +27,11 @@ void Display::display_time(TIME_t time) {
       break;
 
     case ColonState::ACTIVE:
-      tm.switchColon();
+      if (time.second % 2 == 0) {
+        tm.colonOff();
+      } else {
+        tm.colonOn();
+      }
       break;
 
     default:
@@ -35,18 +39,11 @@ void Display::display_time(TIME_t time) {
       break;
   }
 
-  // tm.clearScreen();
-
   if (hour < 10) {
     tm.display((hour * 100) + minute, false, false, 1);
   } else {
     tm.display((hour * 100) + minute, false, false, 0);
   }
-
-  // delete[] time;
 }
 
-void Display::display_err() {
-  // tm.clearScreen();
-  tm.display("Err", false, false, 1);
-}
+void Display::display_err() { tm.display("Err", false, false, 1); }
