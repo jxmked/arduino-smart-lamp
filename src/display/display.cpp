@@ -21,16 +21,32 @@ void Display::display_time(TIME_t time) {
   uint8_t minute = time.minute;
   uint8_t hour = time.hour;
 
-  uint8_t offset = 1;
+  switch (colon) {
+    case ColonState::KEEP_ON:
+      tm.colonOn();
+      break;
 
-  if (colon == ColonState::KEEP_ON ||
-      (colon == ColonState::ACTIVE && second % 2 == 1)) {
-    tm.colonOn();
-  } else {
-    tm.colonOff();
+    case ColonState::ACTIVE:
+      tm.switchColon();
+      break;
+
+    default:
+      tm.colonOff();
+      break;
   }
 
-  if (hour >= 10) offset = 0;
+  // tm.clearScreen();
 
-  tm.display((hour * 100) + minute, false, false, offset);
+  if (hour < 10) {
+    tm.display((hour * 100) + minute, false, false, 1);
+  } else {
+    tm.display((hour * 100) + minute, false, false, 0);
+  }
+
+  // delete[] time;
+}
+
+void Display::display_err() {
+  // tm.clearScreen();
+  tm.display("Err", false, false, 1);
 }

@@ -9,6 +9,9 @@
 class Clock {
  public:
   Clock();
+  
+  bool ready_to_start;
+
   void begin();
   void update(TIME_t* time);
 
