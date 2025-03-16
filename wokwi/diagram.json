@@ -43,7 +43,7 @@
       "left": 280.2,
       "attrs": { "volume": "0.1" }
     },
-    { "type": "wokwi-led", "id": "led1", "top": 34.8, "left": 13.4, "attrs": { "color": "red" } },
+    { "type": "wokwi-led", "id": "led1", "top": 15.6, "left": 3.8, "attrs": { "color": "red" } },
     {
       "type": "wokwi-tm1637-7segment",
       "id": "sevseg1",
@@ -51,7 +51,7 @@
       "left": -271.37,
       "attrs": { "color": "red" }
     },
-    { "type": "wokwi-led", "id": "led2", "top": 6, "left": 32.6, "attrs": { "color": "red" } },
+    { "type": "wokwi-led", "id": "led2", "top": -3.6, "left": 42.2, "attrs": { "color": "red" } },
     {
       "type": "wokwi-text",
       "id": "text1",
@@ -83,8 +83,8 @@
     {
       "type": "wokwi-text",
       "id": "text5",
-      "top": -9.6,
-      "left": -28.8,
+      "top": 0,
+      "left": -38.4,
       "attrs": { "text": "Lamp Leds" }
     },
     {
