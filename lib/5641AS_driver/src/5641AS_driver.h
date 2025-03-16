@@ -45,6 +45,13 @@ class D_5641AS {
 
  private:
   D_5641AS_PINS pins;
+
+  const static uint8_t H0x0 = 0x0;
+  const static uint8_t H0x1 = 0x1;
+  const static uint8_t H0x2 = 0x2;
+  const static uint8_t H0x3 = 0x3;
+  const static uint8_t H0x4 = 0x4;
+  const static uint8_t H0x8 = 0x8;
 };
 
 #endif

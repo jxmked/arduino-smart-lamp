@@ -41,21 +41,21 @@ void D_5641AS::reset_leds() {
 void D_5641AS::set_signal(bool sig) { digitalWrite(pins.SI, sig ? HIGH : LOW); }
 
 void D_5641AS::emit(uint8_t feed) {
-  auto digit_selector = feed & 0x3;
-  auto led_selector = feed >> 3;
+  uint8_t digit_selector = feed & H0x3;
+  uint8_t led_selector = feed >> H0x3;
 
   // Get leds to turn on
-  digitalWrite(pins.S0, ((led_selector & 0x1) > 0) ? HIGH : LOW);
-  digitalWrite(pins.S1, ((led_selector & 0x2) > 0) ? HIGH : LOW);
-  digitalWrite(pins.S2, ((led_selector & 0x4) > 0) ? HIGH : LOW);
-  digitalWrite(pins.S3, ((led_selector & 0x8) > 0) ? HIGH : LOW);
+  digitalWrite(pins.S0, ((led_selector & H0x1) > 0) ? HIGH : LOW);
+  digitalWrite(pins.S1, ((led_selector & H0x2) > 0) ? HIGH : LOW);
+  digitalWrite(pins.S2, ((led_selector & H0x4) > 0) ? HIGH : LOW);
+  digitalWrite(pins.S3, ((led_selector & H0x8) > 0) ? HIGH : LOW);
 
   // Get segment to turn on
-  digitalWrite(pins.D1, (digit_selector == 0x0) ? LOW : HIGH);
-  digitalWrite(pins.D2, (digit_selector == 0x1) ? LOW : HIGH);
-  digitalWrite(pins.D3, (digit_selector == 0x2) ? LOW : HIGH);
-  digitalWrite(pins.D4, (digit_selector == 0x3) ? LOW : HIGH);
+  digitalWrite(pins.D1, (digit_selector == H0x0) ? LOW : HIGH);
+  digitalWrite(pins.D2, (digit_selector == H0x1) ? LOW : HIGH);
+  digitalWrite(pins.D3, (digit_selector == H0x2) ? LOW : HIGH);
+  digitalWrite(pins.D4, (digit_selector == H0x3) ? LOW : HIGH);
 
   // Set signal
-  digitalWrite(pins.SI, ((feed & 0x4) > 0) ? HIGH : LOW);
+  digitalWrite(pins.SI, ((feed & H0x4) > 0) ? HIGH : LOW);
 }

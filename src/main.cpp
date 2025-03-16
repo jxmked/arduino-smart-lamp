@@ -69,6 +69,7 @@ void loop() {
 
       bin |= (digit | 0x4);
 
+      driver.enable();
       driver.emit(bin);
 
       delay(500);
