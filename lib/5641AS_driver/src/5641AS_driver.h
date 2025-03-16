@@ -5,9 +5,9 @@
 
 /**
  * I can't find suitable driver for 7 segment display with model
- * 5641AS that would work with multiplexer. Hoping multiplexer is 
- * fast enough 
- * 
+ * 5641AS that would work with multiplexer. Hoping multiplexer is
+ * fast enough
+ *
  * This driver accepts 7 bit input.
  *
  * 1111 1 11
@@ -18,12 +18,33 @@
  *
  */
 
+struct D_5641AS_PINS {
+  uint8_t D1;
+  uint8_t D2;
+  uint8_t D3;
+  uint8_t D4;
+  uint8_t S0;
+  uint8_t S1;
+  uint8_t S2;
+  uint8_t S3;
+  uint8_t SI;
+  uint8_t EN;
+};
+
 class D_5641AS {
  public:
-  D_5641AS();
+  D_5641AS(D_5641AS_PINS _pins);
 
   void begin();
-  void emit(uint8_t);
+  void reset_digits();
+  void reset_leds();
+  void enable();
+  void disable();
+  void set_signal(bool sig);
+  void emit(uint8_t feed);
+
+ private:
+  D_5641AS_PINS pins;
 };
 
 #endif

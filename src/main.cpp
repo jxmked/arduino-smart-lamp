@@ -2,6 +2,7 @@
 #include <TM1637.h>
 #include <Wire.h>
 
+#include "5641AS_driver.h"
 #include "Button.h"
 #include "TimeInterval.h"
 #include "clock.h"
@@ -49,77 +50,30 @@
 //   if (timer.marked()) display.display_time(time);
 // }
 
-void enable_digit(int d) {
-  digitalWrite(SEG_D_4, HIGH);
-  digitalWrite(SEG_D_3, HIGH);
-  digitalWrite(SEG_D_2, HIGH);
-  digitalWrite(SEG_D_1, HIGH);
-
-  if (d == 1)
-    digitalWrite(SEG_D_1, LOW);
-  else if (d == 2)
-    digitalWrite(SEG_D_2, LOW);
-  else if (d == 3)
-    digitalWrite(SEG_D_3, LOW);
-  else if (d == 4)
-    digitalWrite(SEG_D_4, LOW);
-
-  delay(1);
-}
+D_5641AS driver = D_5641AS({SEG_D_1, SEG_D_2, SEG_D_3, SEG_D_4, SEG_L_S0,
+                            SEG_L_S1, SEG_L_S2, SEG_L_S3, SEG_SIG, SEG_ENA});
 
 void setup() {
-  pinMode(SEG_D_4, OUTPUT);
-  pinMode(SEG_D_3, OUTPUT);
-  pinMode(SEG_D_2, OUTPUT);
-  pinMode(SEG_D_1, OUTPUT);
+  Serial.begin(9600);
 
-  pinMode(SEG_ENA, OUTPUT);
-  pinMode(SEG_SIG, OUTPUT);
+  while (!Serial);
 
-  pinMode(SEG_L_S0, OUTPUT);
-  pinMode(SEG_L_S1, OUTPUT);
-  pinMode(SEG_L_S2, OUTPUT);
-  pinMode(SEG_L_S3, OUTPUT);
-
-  // Enable
-  digitalWrite(SEG_ENA, LOW);
-
-  // Disable leds
-  digitalWrite(SEG_D_4, HIGH);
-  digitalWrite(SEG_D_3, HIGH);
-  digitalWrite(SEG_D_2, HIGH);
-  digitalWrite(SEG_D_1, HIGH);
-
-  digitalWrite(SEG_L_S0, HIGH);
-  digitalWrite(SEG_L_S1, HIGH);
-  digitalWrite(SEG_L_S2, HIGH);
-  digitalWrite(SEG_L_S3, HIGH);
+  driver.begin();
+  driver.enable();
 }
 
 void loop() {
-  for (int digit = 1; digit < 5; digit++) {
-    enable_digit(digit);
-
+  for (int digit = 0x0; digit < 0x4; digit++) {
     for (int count = 0; count < 8; count++) {
-      // RESET
-      digitalWrite(SEG_L_S0, (count & B0001) ? HIGH : LOW);
-      digitalWrite(SEG_L_S1, (count & B0010) ? HIGH : LOW);
-      digitalWrite(SEG_L_S2, (count & B0100) ? HIGH : LOW);
-      digitalWrite(SEG_L_S3, (count & B1000) ? HIGH : LOW);
-    }
+      uint8_t bin = count << 3;
 
-    for (int count = 0; count < 8; count++) {
-      digitalWrite(SEG_SIG, HIGH);
+      bin |= (digit | 0x4);
 
-      // RESET
-      digitalWrite(SEG_L_S0, (count & B0001) ? HIGH : LOW);
-      digitalWrite(SEG_L_S1, (count & B0010) ? HIGH : LOW);
-      digitalWrite(SEG_L_S2, (count & B0100) ? HIGH : LOW);
-      digitalWrite(SEG_L_S3, (count & B1000) ? HIGH : LOW);
+      driver.emit(bin);
 
-      delay(250);
+      delay(500);
 
-      digitalWrite(SEG_SIG, LOW);
+      driver.set_signal(false);
     }
   }
 }
