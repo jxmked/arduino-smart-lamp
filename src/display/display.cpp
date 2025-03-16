@@ -6,10 +6,11 @@
 #include <TM1637.h>
 
 #include "config.h"
+#include "types.h"
 
 TM1637 seg(SEVEN_SEGMENT_CLK_PIN, SEVEN_SEGMENT_DIO_PIN);
 
-Display::Display() {}
+Display::Display() : colon(true) {}
 
 void Display::begin() {
   seg.init();
@@ -17,6 +18,6 @@ void Display::begin() {
   seg.setBrightnessPercent(100);
 }
 
-void Display::display() {}
+void Display::display(TIME_t _time) { seg. }
 
 #endif
