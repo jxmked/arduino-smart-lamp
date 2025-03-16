@@ -11,7 +11,7 @@ TIME_t time;
 void setup() {
   tm.init();
 
-  uint32_t* data = &time;
+  TIME_t &data = time;
 
   tm.setBrightnessPercent(100);
 }

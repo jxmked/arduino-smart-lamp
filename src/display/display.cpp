@@ -18,6 +18,11 @@ void Display::begin() {
   seg.setBrightnessPercent(100);
 }
 
-void Display::display(TIME_t _time) { seg. }
+void Display::display(TIME_t time) {
+  uint8_t second = time.second;
+  uint8_t minute = time.minute;
+
+  
+}
 
 #endif
