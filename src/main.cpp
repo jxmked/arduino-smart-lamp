@@ -12,7 +12,7 @@
 
 TIME_t time = {0, 30, 9};
 
-TimeInterval timer = TimeInterval(100, 0, true);
+TimeInterval timer = TimeInterval(250, 0, true);
 Lamp lamp =
     Lamp((uint8_t)LAMP_LED_PIN, (float[LAMP_LED_BRIGHNESS_COUNT]){0.3, 1.0});
 
@@ -43,9 +43,8 @@ void loop() {
     lamp.toggle_state();
     lamp.update();
   }
-  // clock.update(&time);
 
-  // display.display_time(time);
+  clock.update(&time);
 
-  // delay(250);
+  if (timer.marked()) display.display_time(time);
 }
