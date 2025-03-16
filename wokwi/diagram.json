@@ -139,13 +139,13 @@
     [ "rtc1:GND", "uno:GND.3", "black", [ "h-28.8", "v57.6", "h-105.6" ] ],
     [ "btn1:1.r", "uno:GND.1", "black", [ "v19.4", "h-48" ] ],
     [ "led1:C", "uno:GND.1", "black", [ "h0.4", "v28.8", "h28.5" ] ],
-    [ "led1:A", "uno:8", "red", [ "v9.6", "h96", "v28.8", "h9.2" ] ],
     [ "sevseg1:GND", "uno:GND.3", "black", [ "h0", "v192", "h268.8" ] ],
     [ "sevseg1:VCC", "uno:5V", "red", [ "h19.2", "v172.8", "h226.6" ] ],
     [ "sevseg1:DIO", "uno:12", "gold", [ "h28.8", "v-38.4", "h192" ] ],
     [ "led2:A", "led1:A", "red", [ "v0" ] ],
     [ "led2:C", "led1:C", "black", [ "v38.4", "h-19.2" ] ],
-    [ "sevseg1:CLK", "uno:13", "green", [ "h57.6", "v-19.2", "h134.4" ] ]
+    [ "sevseg1:CLK", "uno:13", "green", [ "h57.6", "v-19.2", "h134.4" ] ],
+    [ "led1:A", "uno:9", "red", [ "v9.6", "h95.2" ] ]
   ],
   "dependencies": {}
 }

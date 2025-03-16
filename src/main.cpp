@@ -2,18 +2,24 @@
 #include <TM1637.h>
 #include <Wire.h>
 
+#include "Button.h"
 #include "TimeInterval.h"
 #include "clock.h"
 #include "config.h"
 #include "display/display.h"
+#include "lamp.h"
 #include "types.h"
 
 TIME_t time = {0, 30, 9};
 
 TimeInterval timer = TimeInterval(100, 0, true);
+Lamp lamp =
+    Lamp((uint8_t)LAMP_LED_PIN, (float[LAMP_LED_BRIGHNESS_COUNT]){0.3, 1.0});
 
 Display display;
 Clock clock;
+
+Button touch_lamp(TOUCH_SENSOR_PIN);
 
 void setup() {
   Serial.begin(9600);
@@ -27,12 +33,19 @@ void setup() {
     display.display_err();
     abort();
   }
+
+  touch_lamp.begin();
+  lamp.update();
 }
 
 void loop() {
-  clock.update(&time);
+  if (touch_lamp.pressed()) {
+    lamp.toggle_state();
+    lamp.update();
+  }
+  // clock.update(&time);
 
-  display.display_time(time);
+  // display.display_time(time);
 
-  delay(250);
+  // delay(250);
 }
