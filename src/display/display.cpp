@@ -1,8 +1,6 @@
-#ifndef DISPLAY_h
-#define DISPLAY_h
-
 #include "display.h"
 
+#include <Arduino.h>
 #include <TM1637.h>
 
 #include "config.h"
@@ -23,6 +21,8 @@ void Display::display_time(TIME_t time) {
   uint8_t minute = time.minute;
   uint8_t hour = time.hour;
 
+  uint8_t offset = 1;
+
   if (colon == ColonState::KEEP_ON ||
       (colon == ColonState::ACTIVE && second % 2 == 1)) {
     tm.colonOn();
@@ -30,8 +30,7 @@ void Display::display_time(TIME_t time) {
     tm.colonOff();
   }
 
-  tm.display(hour, false, true, 0);
-  tm.display(minute, false, true, 3);
-}
+  if (hour >= 10) offset = 0;
 
-#endif
+  tm.display((hour * 100) + minute, false, false, offset);
+}
