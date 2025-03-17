@@ -487,7 +487,7 @@
       "left": -63.4,
       "attrs": { "color": "red" }
     },
-    { "type": "board-cd74hc4067", "id": "mux1", "top": 197.25, "left": -225.71, "attrs": {} },
+    { "type": "board-cd74hc4067", "id": "mux1", "top": 178.05, "left": -225.71, "attrs": {} },
     {
       "type": "wokwi-text",
       "id": "text6",
