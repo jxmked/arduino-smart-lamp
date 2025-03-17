@@ -17,19 +17,18 @@
 
 /** 7 Segment PIN Config **/
 
-#define SEG_D_4 7   // Digit 4
-#define SEG_D_3 8   // Digit 3
-#define SEG_D_2 12  // Digit 2
-#define SEG_D_1 13  // Digit 1
+#define SEG_D_4 9  // Digit 4
+#define SEG_D_3 8  // Digit 3
+#define SEG_D_2 7  // Digit 2
+#define SEG_D_1 6  // Digit 1
 
-// Multiplexer
-#define SEG_ENA 10  // Set to HIGH to disable, otherwise enable
-#define SEG_SIG 11
-
-#define SEG_L_S0 A3
-#define SEG_L_S1 A2
-#define SEG_L_S2 A1
-#define SEG_L_S3 A0
+#define SEG_L_S0 10  // A
+#define SEG_L_S1 11  // B
+#define SEG_L_S2 12  // C
+#define SEG_L_S3 13  // D
+#define SEG_L_S4 A2  // E
+#define SEG_L_S5 A1  // F
+#define SEG_L_S6 A0  // G
 
 /** END 7 Segment PIN Config **/
 
