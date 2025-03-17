@@ -46,8 +46,8 @@ void loop() {
   uint8_t __btn_min_res = digitalRead(BTN_MINU_PIN);
   uint8_t __btn_hr_res = digitalRead(BTN_HOUR_PIN);
 
-  bool min_btn = minute_btn.pressed(digitalRead(BTN_MINU_PIN));
-  bool hr_btn = hour_btn.pressed(digitalRead(BTN_HOUR_PIN));
+  bool min_btn = minute_btn.pressed(__btn_min_res);
+  bool hr_btn = hour_btn.pressed(__btn_hr_res);
 
   if (min_btn && hr_btn) {
     Serial.println("SET BTN PRESSED");

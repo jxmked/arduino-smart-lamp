@@ -39,7 +39,7 @@ void Display::display_time(TIME_t time) {
   sevseg.refreshDisplay();
 }
 
-void Display::display_err(bool with_refresh = false) {
+void Display::display_err(bool with_refresh) {
   sevseg.setChars("Err");
 
   if (with_refresh) sevseg.refreshDisplay();
