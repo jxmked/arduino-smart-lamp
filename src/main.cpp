@@ -19,6 +19,8 @@ Display display;
 Clock clock;
 
 Button touch_lamp(TOUCH_SENSOR_PIN);
+Button minute_btn(BTN_MINU_PIN);
+Button hour_btn(BTN_HOUR_PIN);
 
 void setup() {
   Serial.begin(9600);
@@ -35,13 +37,36 @@ void setup() {
 
   touch_lamp.begin();
   lamp.update();
+
+  minute_btn.begin();
+  hour_btn.begin();
 }
 
 void loop() {
+
   if (touch_lamp.pressed()) {
     lamp.toggle_state();
     lamp.update();
   }
+
+  if(minute_btn.pressed() && !hour_btn.pressed()) {
+    Serial.println("MINUTE BTN PRESSED");
+  }
+
+  if(!minute_btn.pressed() && hour_btn.pressed()) {
+    Serial.println("HOUR BTN PRESSED");
+  }
+
+  if(minute_btn.pressed() && hour_btn.pressed()) {
+    Serial.println("SET BTN PRESSED");
+  }
+
+  // if(minute_btn.read() == Button::RELEASED && hour_btn.read() == Button::RELEASED) {
+  //   Serial.println("SET BTN PRESSED");
+  // }
+
+  // minute_btn.read();
+  // hour_btn.read();
 
   clock.update(&time);
 

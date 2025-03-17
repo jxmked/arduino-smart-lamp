@@ -32,7 +32,7 @@ void Display::display_time(TIME_t time) {
 
   // We move the hour to the tenth to make room for minute
   // at the last 2 digit
-  uint8_t to_display = (hour * 100) + minute;
+  uint16_t to_display = (hour * 100) + minute;
 
   sevseg.setNumber(to_display);
 
@@ -41,6 +41,6 @@ void Display::display_time(TIME_t time) {
 
 void Display::display_err(bool with_refresh = false) {
   sevseg.setChars("Err");
-  
+
   if (with_refresh) sevseg.refreshDisplay();
 }

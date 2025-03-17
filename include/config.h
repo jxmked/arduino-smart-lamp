@@ -1,19 +1,15 @@
 #ifndef CONFIG_h
 #define CONFIG_h
 
-#define SEVEN_SEGMENT_DIO_PIN 12
-#define SEVEN_SEGMENT_CLK_PIN 13
-
-#define LAMP_LED_PIN 9
+#define LAMP_LED_PIN 5
 #define LAMP_LED_BRIGHNESS_COUNT 2
 
-#define BTN_A_PIN 6  // Hour
-#define BTN_B_PIN 5  // Set
-#define BTN_C_PIN 4  // Minute
+#define BTN_MINU_PIN 4  // Set
+#define BTN_HOUR_PIN A3  // Hour\Minute
 
-#define TOUCH_SENSOR_PIN 2  // A push button e.g.
+#define TOUCH_SENSOR_PIN 3  // A push button e.g.
 
-#define BUZZER_PIN 3
+#define BUZZER_PIN 2
 
 /** 7 Segment PIN Config **/
 
