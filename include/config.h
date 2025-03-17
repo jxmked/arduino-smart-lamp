@@ -5,11 +5,11 @@
 #define LAMP_LED_BRIGHNESS_COUNT 2
 
 #define BTN_MINU_PIN 4  // Set
-#define BTN_HOUR_PIN A3  // Hour\Minute
+#define BTN_HOUR_PIN 2  // Hour\Minute
 
 #define TOUCH_SENSOR_PIN 3  // A push button e.g.
 
-#define BUZZER_PIN 2
+#define BUZZER_PIN A3
 
 /** 7 Segment PIN Config **/
 

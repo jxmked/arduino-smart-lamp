@@ -7,7 +7,7 @@
 
 class Lamp {
  public:
-  Lamp(uint8_t _pin, float _brightness[LAMP_LED_BRIGHNESS_COUNT]);
+  Lamp(float _brightness[LAMP_LED_BRIGHNESS_COUNT]);
 
   void begin();
   void update();
@@ -15,7 +15,6 @@ class Lamp {
 
  private:
   uint8_t current_state;
-  uint8_t pin;
   float brightness[LAMP_LED_BRIGHNESS_COUNT];
 };
 
