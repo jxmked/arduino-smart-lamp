@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include <TM1637.h>
 
 #include "types.h"
 
@@ -14,6 +13,6 @@ class Display {
 
   ColonState colon;
 
- private:
-  TM1637 tm;
+//  private:
+//   TM1637 tm;
 };
