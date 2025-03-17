@@ -2,7 +2,6 @@
 #include <Wire.h>
 
 #include "Button.h"
-#include "Dual-pin-Button.h"
 #include "TimeInterval.h"
 #include "clock.h"
 #include "config.h"
@@ -22,8 +21,6 @@ Clock clock;
 Button touch_lamp(TOUCH_SENSOR_PIN);
 Button minute_btn(BTN_MINU_PIN);
 Button hour_btn(BTN_HOUR_PIN);
-
-// DualPinButton set_btn(BTN_HOUR_PIN, BTN_MINU_PIN);
 
 void setup() {
   Serial.begin(9600);
