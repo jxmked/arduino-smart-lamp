@@ -25,14 +25,14 @@ void Button::begin() {
 // public methods
 //
 
-bool Button::read() {
+bool Button::read(uint8_t digital_data) {
 	// ignore pin changes until after this delay time
 	if (_ignore_until > millis()) {
 		// ignore any changes during this period
 	}
 
 	// pin has changed
-	else if (digitalRead(_pin) != _state) {
+	else if (digital_data != _state) {
 		_state = !_state;
 
 		if (_state == RELEASED) {
@@ -51,8 +51,8 @@ bool Button::read() {
 }
 
 // has the button been toggled from on -> off, or vice versa
-bool Button::toggled() {
-	read();
+bool Button::toggled(uint8_t digital_data) {
+	read(digital_data);
 	return has_changed();
 }
 
@@ -71,8 +71,8 @@ uint16_t Button::repeat_count() {
 }
 
 // has the button gone from off -> on or pressed repeatedly
-bool Button::pressed() {
-	if (read() == PRESSED) {
+bool Button::pressed(uint8_t digital_data) {
+	if (read(digital_data) == PRESSED) {
 		uint16_t old_repeats = _reported_repeats;
 		_reported_repeats = repeats_since_press();
 		return (has_changed() || old_repeats != _reported_repeats);
@@ -82,8 +82,8 @@ bool Button::pressed() {
 }
 
 // has the button gone from on -> off
-bool Button::released() {
-	return (read() == RELEASED && has_changed());
+bool Button::released(uint8_t digital_data) {
+	return (read(digital_data) == RELEASED && has_changed());
 }
 
 void Button::set_repeat(uint16_t delay_ms, int16_t repeat_ms) {

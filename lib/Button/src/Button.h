@@ -12,10 +12,10 @@ class Button {
 public:
 	Button(uint8_t pin, uint16_t debounce_ms = 100);
 	void begin();
-	bool read();
-	bool toggled();
-	bool pressed();
-	bool released();
+	bool read(uint8_t digital_data);
+	bool toggled(uint8_t digital_data);
+	bool pressed(uint8_t digital_data);
+	bool released(uint8_t digital_data);
 	bool has_changed();
 	uint16_t repeat_count();
 	void set_repeat(uint16_t delay_ms, int16_t repeat_ms);

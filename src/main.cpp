@@ -2,6 +2,7 @@
 #include <Wire.h>
 
 #include "Button.h"
+#include "Dual-pin-Button.h"
 #include "TimeInterval.h"
 #include "clock.h"
 #include "config.h"
@@ -21,6 +22,8 @@ Clock clock;
 Button touch_lamp(TOUCH_SENSOR_PIN);
 Button minute_btn(BTN_MINU_PIN);
 Button hour_btn(BTN_HOUR_PIN);
+
+// DualPinButton set_btn(BTN_HOUR_PIN, BTN_MINU_PIN);
 
 void setup() {
   Serial.begin(9600);
@@ -43,30 +46,23 @@ void setup() {
 }
 
 void loop() {
+  uint8_t __btn_min_res = digitalRead(BTN_MINU_PIN);
+  uint8_t __btn_hr_res = digitalRead(BTN_HOUR_PIN);
 
-  if (touch_lamp.pressed()) {
-    lamp.toggle_state();
-    lamp.update();
-  }
+  bool min_btn = minute_btn.pressed(digitalRead(BTN_MINU_PIN));
+  bool hr_btn = hour_btn.pressed(digitalRead(BTN_HOUR_PIN));
 
-  if(minute_btn.pressed() && !hour_btn.pressed()) {
-    Serial.println("MINUTE BTN PRESSED");
-  }
-
-  if(!minute_btn.pressed() && hour_btn.pressed()) {
-    Serial.println("HOUR BTN PRESSED");
-  }
-
-  if(minute_btn.pressed() && hour_btn.pressed()) {
+  if (min_btn && hr_btn) {
     Serial.println("SET BTN PRESSED");
+  } else {
+    if (min_btn) {
+      Serial.println("MINUTE BTN PRESSED");
+    }
+
+    if (hr_btn) {
+      Serial.println("Hour BTN PRESSED");
+    }
   }
-
-  // if(minute_btn.read() == Button::RELEASED && hour_btn.read() == Button::RELEASED) {
-  //   Serial.println("SET BTN PRESSED");
-  // }
-
-  // minute_btn.read();
-  // hour_btn.read();
 
   clock.update(&time);
 
