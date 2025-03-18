@@ -14,6 +14,10 @@ class Display {
   void display_time(TIME_t time, BLINKING_SET blinking);
   void display_err(bool with_refresh = false);
 
+  void display_alarm_on();
+  void display_alarm_off();
+  void blank();
+
   // ColonState colon;
 
  private:

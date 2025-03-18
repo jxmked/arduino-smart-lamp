@@ -18,4 +18,10 @@ typedef struct {
  */
 enum class BLINKING_SET { SET_A, SET_B, ALL, NONE };
 
+typedef struct {
+  uint8_t minute;
+  uint8_t hour;
+  bool enabled;
+} ALARM_EVENT_t;
+
 #endif

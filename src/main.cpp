@@ -3,6 +3,7 @@
 
 #include "Button.h"
 #include "TimeInterval.h"
+#include "alarm.h"
 #include "clock.h"
 #include "config.h"
 #include "display/display.h"
@@ -27,9 +28,12 @@ TimeInterval inactive_button = TimeInterval(INACTIVITY_INTERVAL, 0, true);
 
 TimeInterval blinking_ival = TimeInterval(500, 0, true);
 
+TimeInterval alarm_toggle_ival = TimeInterval(3000, 0, true);
+ALARM_TOGGLE_STATE alarm_toggle_state;
+
 Display display;
 Clock clock;
-BLINKING_SET blinkset;
+Alarm alarm;
 
 Button touch_lamp(TOUCH_SENSOR_PIN);
 Button adjust_btn(BTN_ADJUST_PIN);
@@ -54,12 +58,19 @@ void setup() {
     abort();
   }
 
+  ALARM_EVENT_t alarm_data = clock.get_alarm_data();
+
+  alarm.begin();
+  alarm.load_data(alarm_data);
+
   touch_lamp.begin();
   set_btn.begin();
   adjust_btn.begin();
 
   call_set_time_interval.pause();
   call_set_time_interval.reset();
+
+  alarm_toggle_state = ALARM_TOGGLE_STATE::NONE;
 }
 
 void loop() {
@@ -77,16 +88,44 @@ void loop() {
     cursor = 0;
   }
 
+  // Check if alarm is due
+
+  if (alarm.is_due(time)) {
+    Serial.print("ALARMMMM");
+    // SOUND PLEASE
+  }
+
   // Handle lamp
   if (touch_lamp.pressed()) {
     // Stop alarm when the we touch the lamp
     // than toggling the lamp lights
-    if (prog.is_alarming())
-      prog.stop_alarm();
+    if (alarm.is_ringing())
+      alarm.snooze();
     else
       prog.handle_lamp_event();
   }
   // END HANDLE LAMP
+
+  if (alarm_toggle_state != ALARM_TOGGLE_STATE::NONE) {
+    if (alarm_toggle_ival.marked()) {
+      alarm_toggle_state = ALARM_TOGGLE_STATE::NONE;
+      alarm_toggle_ival.pause();
+      alarm_toggle_ival.reset();
+    }
+
+    if (blinking_ival.marked(500)) {
+      if (alarm_toggle_state == ALARM_TOGGLE_STATE::TOGGLED_ON) {
+        display.display_alarm_on();
+      } else {
+        display.display_alarm_off();
+      }
+    } else {
+      display.blank();
+    }
+
+    // Prevent anything yet...
+    return;
+  }
 
   switch (prog.current_display) {
     case DISPLAY_STATE::STANDBY: {
@@ -122,8 +161,25 @@ void loop() {
         }
       }
 
+      // Standby mode - adjust event
+      // toggle alarm on/off
       if (adjust_btn.pressed()) {
         inactive_button.reset();
+
+        ALARM_EVENT_t alarm_data = clock.get_alarm_data();
+
+        alarm_data.enabled = !alarm_data.enabled;
+
+        if (alarm_data.enabled) {
+          alarm_toggle_state = ALARM_TOGGLE_STATE::TOGGLED_ON;
+        } else {
+          alarm_toggle_state = ALARM_TOGGLE_STATE::TOGGLED_OFF;
+        }
+
+        alarm_toggle_ival.reset();
+        alarm_toggle_ival.resume();
+
+        alarm.load_data(alarm_data);
       }
 
     } break;

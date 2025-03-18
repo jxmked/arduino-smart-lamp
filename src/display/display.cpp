@@ -65,5 +65,25 @@ void Display::display_time(TIME_t time, BLINKING_SET blinking) {
 void Display::display_err(bool with_refresh) {
   sevseg.setChars("Err");
 
-  if (with_refresh) sevseg.refreshDisplay();
+  sevseg.refreshDisplay();
+}
+
+void Display::display_alarm_on() {
+  sevseg.setSegmentsDigit(0, 0x3F);
+  sevseg.setSegmentsDigit(0, 0x54);
+
+  sevseg.refreshDisplay();
+}
+
+void Display::display_alarm_off() {
+  sevseg.setSegmentsDigit(0, 0x3F);
+  sevseg.setSegmentsDigit(0, 0x71);
+  sevseg.setSegmentsDigit(0, 0x71);
+
+  sevseg.refreshDisplay();
+}
+
+void Display::blank() {
+  sevseg.blank();
+  sevseg.refreshDisplay();
 }

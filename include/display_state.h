@@ -3,4 +3,6 @@
 
 enum class DISPLAY_STATE { STANDBY, SET_TIME, SET_ALARM };
 
+enum class ALARM_TOGGLE_STATE { NONE, TOGGLED_OFF, TOGGLED_ON };
+
 #endif
