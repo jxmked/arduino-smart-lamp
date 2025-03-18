@@ -1,3 +1,5 @@
+#ifndef DISPLAY_DISPLAY_h
+#define DISPLAY_DISPLAY_h
 #include <Arduino.h>
 
 #include "SevSeg.h"
@@ -9,7 +11,7 @@ class Display {
  public:
   Display();
   void begin();
-  void display_time(TIME_t time);
+  void display_time(TIME_t time, BLINKING_SET blinking);
   void display_err(bool with_refresh = false);
 
   // ColonState colon;
@@ -17,3 +19,5 @@ class Display {
  private:
   SevSeg sevseg;
 };
+
+#endif

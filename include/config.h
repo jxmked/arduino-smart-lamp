@@ -1,13 +1,23 @@
 #ifndef CONFIG_h
 #define CONFIG_h
 
+// SETUPS
+
+#define WAIT_CALL_FOR_SET_TIME 3000  // ms
+
+// Back to standby mode when no event receive has been done for a specific
+// seconds
+#define INACTIVITY_INTERVAL 10000  // ms
+
+// END SETUPS
+
 #define LAMP_LED_PIN 5
 #define LAMP_LED_BRIGHNESS_COUNT 2
 
-#define BTN_MINU_PIN 4  // Set
-#define BTN_HOUR_PIN 2  // Hour\Minute
+#define BTN_SET_PIN 4     // Set
+#define BTN_ADJUST_PIN 3  // Adjust
 
-#define TOUCH_SENSOR_PIN 3  // A push button e.g.
+#define TOUCH_SENSOR_PIN 2  // A push button e.g.
 
 #define BUZZER_PIN A3
 

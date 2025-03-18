@@ -26,7 +26,9 @@ void Display::begin() {
   sevseg.setBrightness(100);
 }
 
-void Display::display_time(TIME_t time) {
+void Display::display_time(TIME_t time, BLINKING_SET blinking) {
+  sevseg.refreshDisplay();
+
   uint8_t minute = time.minute;
   uint8_t hour = time.hour;
 
@@ -36,7 +38,28 @@ void Display::display_time(TIME_t time) {
 
   sevseg.setNumber(to_display);
 
-  sevseg.refreshDisplay();
+  switch (blinking) {
+    case BLINKING_SET::ALL:
+      sevseg.blank();
+      break;
+
+    case BLINKING_SET::SET_A:
+      sevseg.setSegmentsDigit(0, 0x0);
+      sevseg.setSegmentsDigit(1, 0x0);
+      break;
+
+    case BLINKING_SET::SET_B:
+      sevseg.setSegmentsDigit(2, 0x0);
+      sevseg.setSegmentsDigit(3, 0x0);
+      break;
+
+    case BLINKING_SET::NONE:
+      // What should I do????
+      break;
+
+    default:
+      break;
+  }
 }
 
 void Display::display_err(bool with_refresh) {
