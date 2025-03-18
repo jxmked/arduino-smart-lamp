@@ -57,10 +57,11 @@ void Clock::clear_additionals() {
 }
 
 ALARM_EVENT_t Clock::get_alarm_data() {
-  ALARM_EVENT_t data = {
-      rtc.readnvram(ALARM_NVRAM_MINUTE) % 60,
-      rtc.readnvram(ALARM_NVRAM_HOUR) % 24,
-      rtc.readnvram(ALARM_NVRAM_ALARM_ENABLED) ? true : false};
+  uint8_t r_minute = (uint8_t)rtc.readnvram(ALARM_NVRAM_MINUTE) % 60;
+  uint8_t r_hour = (uint8_t)rtc.readnvram(ALARM_NVRAM_HOUR) % 24;
+  bool r_enabled = rtc.readnvram(ALARM_NVRAM_ALARM_ENABLED) ? true : false;
+  
+  ALARM_EVENT_t data = {r_minute, r_hour, r_enabled};
 
   return data;
 }
@@ -68,7 +69,7 @@ ALARM_EVENT_t Clock::get_alarm_data() {
 void Clock::set_alarm_data(ALARM_EVENT_t data) {
   rtc.writenvram(ALARM_NVRAM_MINUTE, data.minute);
   rtc.writenvram(ALARM_NVRAM_HOUR, data.hour);
-  rtc.writenvram(ALARM_NVRAM_ALARM_ENABLED, data.enabled);
+  rtc.writenvram(ALARM_NVRAM_ALARM_ENABLED, data.enabled ? 1 : 0);
 }
 
 bool Clock::alarm_is_set() {
@@ -76,7 +77,7 @@ bool Clock::alarm_is_set() {
 }
 
 bool Clock::alarm_is_set(bool state) {
-  rtc.writenvram(ALARM_NVRAM_ALARM_SET, state);
+  rtc.writenvram(ALARM_NVRAM_ALARM_SET, state ? 1 : 0);
 
   return alarm_is_set();
 }

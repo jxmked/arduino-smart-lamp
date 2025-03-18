@@ -180,6 +180,8 @@ void loop() {
         alarm_toggle_ival.resume();
 
         alarm.load_data(alarm_data);
+
+        clock.set_alarm_data(alarm_data);  // Update alarm data to nvram
       }
 
     } break;
