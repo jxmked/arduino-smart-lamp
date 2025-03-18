@@ -5,7 +5,11 @@
 #include "types.h"
 
 Alarm::Alarm()
-    : current_alarm{0, 0, false}, rang_count(0), next_rang(1), ringing(false) {}
+    : current_alarm{0, 0, false},
+      rang_count(0),
+      next_rang(1),
+      ringing(false),
+      adjustments{0, 0, false} {}
 
 void Alarm::begin() {}
 void Alarm::load_data(ALARM_EVENT_t data) { current_alarm = data; }
@@ -37,3 +41,17 @@ void Alarm::snooze() {
 }
 
 bool Alarm::is_ringing() { return ringing; }
+
+void Alarm::increase_minute() { adjustments.minute++; }
+
+void Alarm::increase_hour() { adjustments.hour++; }
+
+ALARM_EVENT_t Alarm::get_alarm_data() {
+  uint8_t r_minute =
+      (uint8_t)((current_alarm.minute + adjustments.minute) % 60);
+  uint8_t r_hour = (uint8_t)((current_alarm.hour + adjustments.hour) % 24);
+
+  return {r_minute, r_hour, true};
+}
+
+void Alarm::clear_adjustments() { adjustments = {0, 0, false}; }

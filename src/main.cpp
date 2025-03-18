@@ -58,6 +58,14 @@ void setup() {
     abort();
   }
 
+  if (!clock.alarm_is_set()) {
+    ALARM_EVENT_t fresh_alarm_data = {6, 30, true};
+
+    clock.set_alarm_data(fresh_alarm_data);
+
+    clock.alarm_is_set(true);
+  }
+
   ALARM_EVENT_t alarm_data = clock.get_alarm_data();
 
   alarm.begin();
@@ -85,6 +93,7 @@ void loop() {
       prog.current_display != DISPLAY_STATE::STANDBY) {
     prog.current_display = DISPLAY_STATE::STANDBY;
     clock.clear_additionals();
+    alarm.clear_adjustments();
     cursor = 0;
   }
 
@@ -219,7 +228,40 @@ void loop() {
     } break;
 
     case DISPLAY_STATE::SET_ALARM: {
-      Serial.println("asdasd");
+      ALARM_EVENT_t alarm_data = alarm.get_alarm_data();
+
+      if (set_btn.pressed()) {
+        inactive_button.reset();
+
+        if (cursor == 1) {
+          cursor = 2;
+        } else {
+          prog.standby();
+
+          call_set_time_interval.pause();
+          call_set_time_interval.reset();
+          alarm.clear_adjustments();
+
+          clock.set_alarm_data(alarm_data);
+
+          cursor = 0;
+        }
+      }
+
+      if (adjust_btn.pressed()) {
+        inactive_button.reset();
+
+        if (cursor == 1) {
+          alarm.increase_minute();
+        } else if (cursor == 2) {
+          alarm.increase_hour();
+        }
+
+        clock.set_alarm_data(alarm_data);
+      }
+
+      TIME_t alarm_time = {0, alarm_data.minute, alarm_data.hour};
+      time_to_disp = alarm_time;
     } break;
   }
 

@@ -15,12 +15,17 @@ class Alarm {
   void deactivate();
   void snooze();
   bool is_ringing();
+  void increase_minute();
+  void increase_hour();
+  ALARM_EVENT_t get_alarm_data();
+  void clear_adjustments();
 
  private:
   ALARM_EVENT_t current_alarm;
   uint8_t rang_count;
   uint8_t next_rang;
   bool ringing;
+  ALARM_EVENT_t adjustments;
 };
 
 #endif
