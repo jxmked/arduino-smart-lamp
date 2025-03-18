@@ -11,6 +11,7 @@ class Program {
   void handle_lamp_event();
   void handle_set_time_event();
   void handle_set_alarm_event();
+  void standby();
   void display_time();
   void display_set_time();
   bool is_alarming();

@@ -25,6 +25,8 @@ void Program::handle_set_time_event() {
 
 void Program::handle_set_alarm_event() {}
 
+void Program::standby() { current_display = DISPLAY_STATE::STANDBY; }
+
 void Program::display_time() {}
 
 void Program::display_set_time() {}

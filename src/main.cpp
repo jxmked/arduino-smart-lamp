@@ -11,7 +11,11 @@
 #include "program.h"
 #include "types.h"
 
+// Actual Time
 TIME_t time = {0, 30, 9};
+
+// Time to display
+TIME_t time_to_disp;
 
 // Press and hold set button to set time
 TimeInterval call_set_time_interval =
@@ -32,6 +36,8 @@ Button adjust_btn(BTN_ADJUST_PIN);
 Button set_btn(BTN_SET_PIN);
 
 Program prog;
+
+uint8_t cursor = 0;
 
 void setup() {
   Serial.begin(9600);
@@ -54,19 +60,21 @@ void setup() {
 
   call_set_time_interval.pause();
   call_set_time_interval.reset();
-
-  blinkset = BLINKING_SET::NONE;
 }
 
 void loop() {
   clock.update(&time);
 
+  inactive_button.update();
+
+  time_to_disp = time;
+
   // INACTIVE EVENT
   if (inactive_button.marked() &&
       prog.current_display != DISPLAY_STATE::STANDBY) {
-    Serial.println("Going back to standby mode");
     prog.current_display = DISPLAY_STATE::STANDBY;
-    blinkset = BLINKING_SET::NONE;
+    clock.clear_additionals();
+    cursor = 0;
   }
 
   // Handle lamp
@@ -80,48 +88,76 @@ void loop() {
   }
   // END HANDLE LAMP
 
-  if (prog.current_display == DISPLAY_STATE::STANDBY) {
-    if (set_btn.read() == Button::PRESSED) {
-      inactive_button.reset();
+  switch (prog.current_display) {
+    case DISPLAY_STATE::STANDBY: {
+      cursor = 0;
 
-      // Set time
-
-      // Wait for interval before calling
-      // set time
-      call_set_time_interval.resume();
-
-      set_btn.has_changed();  // clear change state
-
-      if (call_set_time_interval.marked()) {
-        call_set_time_interval.pause();
-
-        prog.handle_set_time_event();
-      }
-    } else {
-      call_set_time_interval.pause();
-      call_set_time_interval.reset();
-
-      if (set_btn.has_changed()) {
+      if (set_btn.read() == Button::PRESSED) {
         inactive_button.reset();
 
-        // Set alarm
-        prog.handle_set_alarm_event();
+        // Set time
+
+        // Wait for interval before calling
+        // set time
+        call_set_time_interval.resume();
+
+        set_btn.has_changed();  // clear change state
+
+        if (call_set_time_interval.marked()) {
+          call_set_time_interval.pause();
+          call_set_time_interval.reset();
+
+          cursor = 1;
+          prog.handle_set_time_event();
+        }
+      } else {
+        call_set_time_interval.pause();
+        call_set_time_interval.reset();
+
+        if (set_btn.has_changed()) {
+          inactive_button.reset();
+
+          // Set alarm
+          prog.handle_set_alarm_event();
+        }
       }
-    }
 
-    if (adjust_btn.pressed()) {
-      inactive_button.reset();
+      if (adjust_btn.pressed()) {
+        inactive_button.reset();
+      }
 
-      return;
-    }
-  }
-
-  switch (prog.current_display) {
-    case DISPLAY_STATE::STANDBY:
-      break;
+    } break;
 
     case DISPLAY_STATE::SET_TIME: {
-      blinkset = BLINKING_SET::ALL;
+      if (set_btn.pressed()) {
+        inactive_button.reset();
+
+        if (cursor == 1) {
+          cursor = 2;
+        } else {
+          prog.standby();
+
+          call_set_time_interval.pause();
+          call_set_time_interval.reset();
+
+          clock.set_time();
+          clock.clear_additionals();
+
+          cursor = 0;
+        }
+      }
+
+      if (adjust_btn.pressed()) {
+        inactive_button.reset();
+
+        if (cursor == 1) {
+          clock.increment_minute();
+        } else if (cursor == 2) {
+          clock.increment_hour();
+        }
+      }
+
+      clock.temporary_clock(&time_to_disp);
     } break;
 
     case DISPLAY_STATE::SET_ALARM: {
@@ -130,8 +166,14 @@ void loop() {
   }
 
   if (blinking_ival.marked(500)) {
-    display.display_time(time, blinkset);
+    if (cursor == 1)
+      display.display_time(time_to_disp, BLINKING_SET::SET_B);
+    else if (cursor == 2)
+      display.display_time(time_to_disp, BLINKING_SET::SET_A);
+    else
+      display.display_time(time_to_disp, BLINKING_SET::NONE);
+
   } else {
-    display.display_time(time, BLINKING_SET::NONE);
+    display.display_time(time_to_disp, BLINKING_SET::NONE);
   }
 }

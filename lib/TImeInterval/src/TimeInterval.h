@@ -2,15 +2,17 @@
 #define TimeInterval_h
 
 class TimeInterval {
-public:
-  TimeInterval(unsigned long interval, unsigned long offset = 0, bool autoUpdate = false);
+ public:
+  TimeInterval(unsigned long interval, unsigned long offset = 0,
+               bool autoUpdate = false);
   void update();
   bool marked(unsigned long holdMillis = 0);
   void reset();
   void pause();
   void resume();
+  bool is_paused();
 
-private:
+ private:
   unsigned long interval;
   bool autoUpdate;
   unsigned long lastTime;
