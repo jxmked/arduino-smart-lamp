@@ -44,6 +44,8 @@ uint8_t cursor = 0;
 DISPLAY_STATE current_display;
 DISPLAY_STATE last_display;
 
+static void display_switch(void);
+
 void setup() {
   Serial.begin(9600);
 
@@ -143,6 +145,22 @@ void loop() {
     return;
   }
 
+  display_switch();
+
+  if (blinking_ival.marked(500)) {
+    if (cursor == 1)
+      display.display_time(time_to_disp, BLINKING_SET::SET_B);
+    else if (cursor == 2)
+      display.display_time(time_to_disp, BLINKING_SET::SET_A);
+    else
+      display.display_time(time_to_disp, BLINKING_SET::NONE);
+
+  } else {
+    display.display_time(time_to_disp, BLINKING_SET::NONE);
+  }
+}
+
+static void display_switch(void) {
   switch (current_display) {
     case DISPLAY_STATE::STANDBY: {
       cursor = 0;
@@ -270,17 +288,5 @@ void loop() {
       time_to_disp.minute = alarm_data.minute;
 
     } break;
-  }
-
-  if (blinking_ival.marked(500)) {
-    if (cursor == 1)
-      display.display_time(time_to_disp, BLINKING_SET::SET_B);
-    else if (cursor == 2)
-      display.display_time(time_to_disp, BLINKING_SET::SET_A);
-    else
-      display.display_time(time_to_disp, BLINKING_SET::NONE);
-
-  } else {
-    display.display_time(time_to_disp, BLINKING_SET::NONE);
   }
 }
