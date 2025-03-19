@@ -12,6 +12,14 @@
 #include "tone.h"
 #include "types.h"
 
+/**
+ *
+ * LAGAY NYO LANG
+ * 0 = 0-12 hours
+ * 1 = 0-24 hours
+ */
+#define MILITARY_TIME 0
+
 // Actual Time
 TIME_t time = {0, 30, 9};
 
@@ -107,9 +115,17 @@ void loop() {
   clock.update(&time);
   alarm.update(time);
 
-  inactive_button.update();
-
   time_to_disp = time;
+
+  // Only affect the time when its standby
+  if (current_display == DISPLAY_STATE::STANDBY && MILITARY_TIME == 0) {
+    if (time_to_disp.hour == 0) {
+      time_to_disp.hour = 12;
+    } else {
+      time_to_disp.hour =
+          time_to_disp.hour > 12 ? time_to_disp.hour - 12 : time_to_disp.hour;
+    }
+  }
 
   // INACTIVE EVENT
   if (inactive_button.marked() && current_display != DISPLAY_STATE::STANDBY) {
