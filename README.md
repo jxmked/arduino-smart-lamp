@@ -14,11 +14,14 @@ Display current time to 4-digit seven segment display with either 24-hour or 12-
 
 ### Alarm
 
-- Press once Set Button (Red Button) to set the alarm
+- Press once Set Button (Red Button) to set the alarm and the minute will blink.
+  > The blink indicate that you are about to adjust that number
 
 #### Once in Set Alarm mode:
 
-- Press Hour or Minute button (Yellow Button) to set the alarm
+- Press Adjust Button (Yellow Button) to increase minute.
+- Press Set Button (Red Button) again to move the cursor to the hour.
+- Press Adjust Button (Yellow Button) to increase hour.
 - If satisfied with the alarm, press the Set Button (Red Button) again to finalize the alarm
   
   > Note: The time in Set Alarm Mode is formatted with 24-hour (Military) format to know if the alarm is set to AM or PM
@@ -30,7 +33,10 @@ Display current time to 4-digit seven segment display with either 24-hour or 12-
 
 ### Time
 
-- Long press the Set Button (Red Button) to set the current time
-- Press Hour or Minute button (Yellow Button) to set the time
+- Long press the Set Button (Red Button) to set the current time. The minute will blink
+  > The blink indicate that you are about to adjust that number
+- Press Adjust Button (Yellow Button) to increase minute.
+- Press Set Button (Red Button) again to move the cursor to the hour.
+- Press Adjust Button (Yellow Button) to increase hour.
 - If satisfied with the time, press the Set Button (Red Button) again to finalize the time
 
