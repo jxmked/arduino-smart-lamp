@@ -69,7 +69,6 @@ ALARM_EVENT_t Clock::get_alarm_data() {
 }
 
 void Clock::set_alarm_data(ALARM_EVENT_t data) {
-  Serial.println(data.hour);
   rtc.writenvram(ALARM_NVRAM_MINUTE, data.minute);
   rtc.writenvram(ALARM_NVRAM_HOUR, data.hour);
   rtc.writenvram(ALARM_NVRAM_ALARM_ENABLED, data.enabled ? 1 : 0);

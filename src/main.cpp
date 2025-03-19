@@ -9,6 +9,7 @@
 #include "display/display.h"
 #include "display_state.h"
 #include "lamp.h"
+#include "tone.h"
 #include "types.h"
 
 // Actual Time
@@ -30,6 +31,8 @@ TimeInterval blinking_ival = TimeInterval(500, 0, true);
 TimeInterval alarm_toggle_ival = TimeInterval(3000, 0, true);
 ALARM_TOGGLE_STATE alarm_toggle_state;
 
+TimeInterval buzzer_ival = TimeInterval(100, 0, true);
+
 Display display;
 Clock clock;
 Alarm alarm;
@@ -39,12 +42,14 @@ Button adjust_btn(BTN_ADJUST_PIN);
 Button set_btn(BTN_SET_PIN);
 
 Lamp lamp = Lamp((float[LAMP_LED_BRIGHNESS_COUNT]){0.3, 1.0});
+Tone tone_alarm;
 
 uint8_t cursor = 0;
 DISPLAY_STATE current_display;
 DISPLAY_STATE last_display;
 
 static void display_switch(void);
+static void stop_alarm(void);
 
 void setup() {
   Serial.begin(9600);
@@ -60,7 +65,11 @@ void setup() {
   }
 
   if (!clock.alarm_is_set()) {
-    ALARM_EVENT_t fresh_alarm_data = {7, 30, false};
+    const char* timeStr = __TIME__;
+    uint8_t build_hour = (timeStr[0] - '0') * 10 + (timeStr[1] - '0');
+    uint8_t build_minute = (timeStr[3] - '0') * 10 + (timeStr[4] - '0');
+
+    ALARM_EVENT_t fresh_alarm_data = {build_hour, build_minute + 1, false};
 
     clock.set_alarm_data(fresh_alarm_data);
 
@@ -76,6 +85,8 @@ void setup() {
 
   lamp.begin();
   lamp.update();
+
+  tone_alarm.begin(BUZZER_PIN);
 
   touch_lamp.begin();
   set_btn.begin();
@@ -111,7 +122,7 @@ void loop() {
   alarm.is_due();
 
   if (alarm.is_ringing()) {
-    Serial.print("ALARMMMM");
+    tone_alarm.play();
   }
 
   // Handle lamp
@@ -119,7 +130,7 @@ void loop() {
     // Stop alarm when the we touch the lamp
     // than toggling the lamp lights
     if (alarm.is_ringing()) {
-      alarm.snooze();
+      stop_alarm();
     } else {
       lamp.toggle_state();
       lamp.update();
@@ -166,12 +177,24 @@ void loop() {
   }
 }
 
+static void stop_alarm(void) {
+  if (alarm.is_ringing()) {
+    alarm.snooze();
+    tone_alarm.stop();
+  }
+}
+
 static void display_switch(void) {
   switch (current_display) {
     case DISPLAY_STATE::STANDBY: {
       cursor = 0;
 
       if (set_btn.read() == Button::PRESSED) {
+        if (alarm.is_ringing()) {
+          stop_alarm();
+          return;
+        }
+
         inactive_button.reset();
 
         // Set time
@@ -207,6 +230,11 @@ static void display_switch(void) {
       // Standby mode - adjust event
       // toggle alarm on/off
       if (adjust_btn.pressed()) {
+        if (alarm.is_ringing()) {
+          stop_alarm();
+          return;
+        }
+
         inactive_button.reset();
 
         ALARM_EVENT_t alarm_data = clock.get_alarm_data();
