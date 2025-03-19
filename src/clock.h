@@ -23,6 +23,7 @@ class Clock {
   void set_alarm_data(ALARM_EVENT_t data);
   bool alarm_is_set();
   bool alarm_is_set(bool state);
+  uint8_t get_day();
 
  private:
   RTC_DS1307 rtc;

@@ -60,7 +60,7 @@ void setup() {
   }
 
   if (!clock.alarm_is_set()) {
-    ALARM_EVENT_t fresh_alarm_data = {6, 30, false};
+    ALARM_EVENT_t fresh_alarm_data = {7, 30, false};
 
     clock.set_alarm_data(fresh_alarm_data);
 
@@ -71,6 +71,8 @@ void setup() {
 
   alarm.begin();
   alarm.load_data(alarm_data);
+  alarm.set_day(clock.get_day());
+  alarm.activate();
 
   lamp.begin();
   lamp.update();
@@ -90,6 +92,7 @@ void setup() {
 
 void loop() {
   clock.update(&time);
+  alarm.update(time);
 
   inactive_button.update();
 
@@ -105,18 +108,19 @@ void loop() {
 
   // Check if alarm is due
 
-  if (alarm.is_due(time)) {
+  alarm.is_due();
+
+  if (alarm.is_ringing()) {
     Serial.print("ALARMMMM");
-    // SOUND PLEASE
   }
 
   // Handle lamp
   if (touch_lamp.pressed()) {
     // Stop alarm when the we touch the lamp
     // than toggling the lamp lights
-    if (alarm.is_ringing())
+    if (alarm.is_ringing()) {
       alarm.snooze();
-    else {
+    } else {
       lamp.toggle_state();
       lamp.update();
     }
@@ -152,6 +156,8 @@ void loop() {
       display.display_time(time_to_disp, BLINKING_SET::SET_B);
     else if (cursor == 2)
       display.display_time(time_to_disp, BLINKING_SET::SET_A);
+    else if (cursor == 3)
+      display.display_time(time_to_disp, BLINKING_SET::ALL);
     else
       display.display_time(time_to_disp, BLINKING_SET::NONE);
 
@@ -187,12 +193,14 @@ static void display_switch(void) {
         call_set_time_interval.pause();
         call_set_time_interval.reset();
 
-        if (set_btn.has_changed()) {
+        if (set_btn.has_changed() && last_display != DISPLAY_STATE::SET_ALARM) {
           inactive_button.reset();
 
           // Set alarm
           cursor = 1;
           current_display = DISPLAY_STATE::SET_ALARM;
+        } else {
+          last_display = DISPLAY_STATE::STANDBY;
         }
       }
 
@@ -206,8 +214,10 @@ static void display_switch(void) {
         alarm_data.enabled = !alarm_data.enabled;
 
         if (alarm_data.enabled) {
+          alarm.activate();
           alarm_toggle_state = ALARM_TOGGLE_STATE::TOGGLED_ON;
         } else {
+          alarm.deactivate();
           alarm_toggle_state = ALARM_TOGGLE_STATE::TOGGLED_OFF;
         }
 
@@ -263,12 +273,20 @@ static void display_switch(void) {
           cursor = 2;
         } else {
           current_display = DISPLAY_STATE::STANDBY;
+          last_display = DISPLAY_STATE::SET_ALARM;
 
           call_set_time_interval.pause();
           call_set_time_interval.reset();
 
           clock.set_alarm_data(alarm_data);
+
+          alarm.load_data(alarm_data);
+
           alarm.clear_adjustments();
+
+          clock.alarm_is_set(true);
+
+          cursor = 0;
         }
 
         set_btn.has_changed();

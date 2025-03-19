@@ -7,6 +7,7 @@ typedef struct {
   uint8_t second;
   uint8_t minute;
   uint8_t hour;
+  uint8_t day;
 } TIME_t;
 
 /**
@@ -19,8 +20,8 @@ typedef struct {
 enum class BLINKING_SET { SET_A, SET_B, ALL, NONE };
 
 typedef struct {
-  uint8_t minute;
   uint8_t hour;
+  uint8_t minute;
   bool enabled;
 } ALARM_EVENT_t;
 

@@ -10,7 +10,7 @@ class Alarm {
   Alarm();
   void begin();
   void load_data(ALARM_EVENT_t data);
-  bool is_due(TIME_t time);
+  bool is_due();
   void activate();
   void deactivate();
   void snooze();
@@ -19,13 +19,15 @@ class Alarm {
   void increase_hour();
   ALARM_EVENT_t get_alarm_data();
   void clear_adjustments();
+  void set_day(uint8_t _day);
+  void update(TIME_t _time);
 
  private:
   ALARM_EVENT_t current_alarm;
-  uint8_t rang_count;
-  uint8_t next_rang;
+  TIME_t time;
   bool ringing;
   ALARM_EVENT_t adjustments;
+  uint8_t day;
 };
 
 #endif

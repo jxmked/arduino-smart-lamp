@@ -48,6 +48,8 @@ void Clock::temporary_clock(TIME_t* time) {
   time->second = (now.second() + additionals.second) % 60;
   time->minute = (now.minute() + additionals.minute) % 60;
   time->hour = (now.hour() + additionals.hour) % 24;
+
+  time->day = now.day();
 }
 
 void Clock::clear_additionals() {
@@ -57,16 +59,17 @@ void Clock::clear_additionals() {
 }
 
 ALARM_EVENT_t Clock::get_alarm_data() {
-  uint8_t r_minute = (uint8_t)rtc.readnvram(ALARM_NVRAM_MINUTE) % 60;
-  uint8_t r_hour = (uint8_t)rtc.readnvram(ALARM_NVRAM_HOUR) % 24;
+  byte r_minute = rtc.readnvram(ALARM_NVRAM_MINUTE) % 60;
+  byte r_hour = rtc.readnvram(ALARM_NVRAM_HOUR) % 24;
   bool r_enabled = rtc.readnvram(ALARM_NVRAM_ALARM_ENABLED) ? true : false;
-  
-  ALARM_EVENT_t data = {r_minute, r_hour, r_enabled};
+
+  ALARM_EVENT_t data = {r_hour, r_minute, r_enabled};
 
   return data;
 }
 
 void Clock::set_alarm_data(ALARM_EVENT_t data) {
+  Serial.println(data.hour);
   rtc.writenvram(ALARM_NVRAM_MINUTE, data.minute);
   rtc.writenvram(ALARM_NVRAM_HOUR, data.hour);
   rtc.writenvram(ALARM_NVRAM_ALARM_ENABLED, data.enabled ? 1 : 0);
@@ -81,3 +84,5 @@ bool Clock::alarm_is_set(bool state) {
 
   return alarm_is_set();
 }
+
+uint8_t Clock::get_day() { return rtc.now().day(); }
