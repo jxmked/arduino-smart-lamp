@@ -6,7 +6,7 @@
 #include "alarm.h"
 #include "clock.h"
 #include "config.h"
-#include "display/display.h"
+#include "display.h"
 #include "display_state.h"
 #include "lamp.h"
 #include "tone.h"
