@@ -23,9 +23,4 @@ void Lamp::update() {
 void Lamp::toggle_state() {
   current_state++;
   current_state = current_state % (LAMP_LED_BRIGHNESS_COUNT + 1);
-
-  Serial.print("Lamp state changed: ");
-  Serial.print(current_state);
-  Serial.print(" with value: ");
-  Serial.println(brightness[current_state] * 255);
 }

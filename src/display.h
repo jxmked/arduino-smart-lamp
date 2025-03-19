@@ -18,8 +18,6 @@ class Display {
   void display_alarm_off();
   void blank();
 
-  // ColonState colon;
-
  private:
   SevSeg sevseg;
 };

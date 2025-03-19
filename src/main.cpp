@@ -185,180 +185,187 @@ static void stop_alarm(void) {
   cursor = 0;
 }
 
+static void handle_display_standby() {
+  if (set_btn.read() == Button::PRESSED) {
+    if (alarm.is_ringing()) {
+      stop_alarm();
+      set_btn.has_changed();
+      return;
+    }
+
+    inactive_button.reset();
+
+    // Set time
+
+    // Wait for interval before calling
+    // set time
+    call_set_time_interval.resume();
+
+    set_btn.has_changed();  // clear change state
+
+    if (call_set_time_interval.marked()) {
+      tone_alarm.click();
+      inactive_button.reset();
+
+      call_set_time_interval.pause();
+      call_set_time_interval.reset();
+
+      cursor = 1;
+      current_display = DISPLAY_STATE::SET_TIME;
+    }
+  } else {
+    call_set_time_interval.pause();
+    call_set_time_interval.reset();
+
+    if (set_btn.has_changed() && last_display != DISPLAY_STATE::SET_ALARM) {
+      tone_alarm.click();
+
+      inactive_button.reset();
+
+      // Set alarm
+      cursor = 1;
+      current_display = DISPLAY_STATE::SET_ALARM;
+    } else {
+      last_display = DISPLAY_STATE::STANDBY;
+    }
+  }
+
+  // Standby mode - adjust event
+  // toggle alarm on/off
+  if (adjust_btn.pressed()) {
+    tone_alarm.click();
+
+    if (alarm.is_ringing()) {
+      stop_alarm();
+      return;
+    }
+
+    inactive_button.reset();
+
+    ALARM_EVENT_t alarm_data = clock.get_alarm_data();
+
+    alarm_data.enabled = !alarm_data.enabled;
+
+    if (alarm_data.enabled) {
+      alarm.activate();
+      alarm_toggle_state = ALARM_TOGGLE_STATE::TOGGLED_ON;
+    } else {
+      alarm.deactivate();
+      alarm_toggle_state = ALARM_TOGGLE_STATE::TOGGLED_OFF;
+    }
+
+    alarm_toggle_ival.reset();
+    alarm_toggle_ival.resume();
+
+    alarm.load_data(alarm_data);
+
+    clock.set_alarm_data(alarm_data);  // Update alarm data to nvram
+  }
+}
+
+static void handlle_display_set_time(void) {
+  if (set_btn.pressed()) {
+    tone_alarm.click();
+
+    inactive_button.reset();
+
+    if (cursor == 1) {
+      cursor = 2;
+    } else {
+      current_display = DISPLAY_STATE::STANDBY;
+
+      call_set_time_interval.pause();
+      call_set_time_interval.reset();
+
+      clock.set_time();
+      clock.clear_additionals();
+
+      cursor = 0;
+    }
+  }
+
+  if (adjust_btn.pressed()) {
+    tone_alarm.click();
+
+    inactive_button.reset();
+
+    if (cursor == 1) {
+      clock.increment_minute();
+    } else if (cursor == 2) {
+      clock.increment_hour();
+    }
+  }
+
+  clock.temporary_clock(&time_to_disp);
+}
+
+static void handle_display_set_alarm(void) {
+  ALARM_EVENT_t alarm_data = alarm.get_alarm_data();
+
+  if (set_btn.pressed()) {
+    tone_alarm.click();
+
+    inactive_button.reset();
+
+    if (cursor == 1) {
+      cursor = 2;
+    } else {
+      current_display = DISPLAY_STATE::STANDBY;
+      last_display = DISPLAY_STATE::SET_ALARM;
+
+      call_set_time_interval.pause();
+      call_set_time_interval.reset();
+
+      clock.set_alarm_data(alarm_data);
+
+      alarm.load_data(alarm_data);
+
+      alarm.clear_adjustments();
+
+      clock.alarm_is_set(true);
+
+      // check if the alarm is
+      // due or not
+      if (time.hour <= alarm_data.hour && time.minute <= alarm_data.minute) {
+        alarm.set_day(time.day);
+      } else {
+        alarm.set_day(time.day + 1);
+      }
+
+      cursor = 0;
+    }
+
+    set_btn.has_changed();
+  }
+
+  if (adjust_btn.pressed()) {
+    tone_alarm.click();
+
+    inactive_button.reset();
+
+    if (cursor == 1) {
+      alarm.increase_minute();
+    } else if (cursor == 2) {
+      alarm.increase_hour();
+    }
+  }
+
+  time_to_disp.hour = alarm_data.hour;
+  time_to_disp.minute = alarm_data.minute;
+}
+
 static void display_switch(void) {
   switch (current_display) {
-    case DISPLAY_STATE::STANDBY: {
-      cursor = 0;
+    case DISPLAY_STATE::STANDBY:
+      handle_display_standby();
+      break;
 
-      if (set_btn.read() == Button::PRESSED) {
-        if (alarm.is_ringing()) {
-          stop_alarm();
-          set_btn.has_changed();
-          return;
-        }
+    case DISPLAY_STATE::SET_TIME:
+      handlle_display_set_time();
+      break;
 
-        inactive_button.reset();
-
-        // Set time
-
-        // Wait for interval before calling
-        // set time
-        call_set_time_interval.resume();
-
-        set_btn.has_changed();  // clear change state
-
-        if (call_set_time_interval.marked()) {
-          tone_alarm.click();
-          inactive_button.reset();
-
-          call_set_time_interval.pause();
-          call_set_time_interval.reset();
-
-          cursor = 1;
-          current_display = DISPLAY_STATE::SET_TIME;
-        }
-      } else {
-        call_set_time_interval.pause();
-        call_set_time_interval.reset();
-
-        if (set_btn.has_changed() && last_display != DISPLAY_STATE::SET_ALARM) {
-          tone_alarm.click();
-
-          inactive_button.reset();
-
-          // Set alarm
-          cursor = 1;
-          current_display = DISPLAY_STATE::SET_ALARM;
-        } else {
-          last_display = DISPLAY_STATE::STANDBY;
-        }
-      }
-
-      // Standby mode - adjust event
-      // toggle alarm on/off
-      if (adjust_btn.pressed()) {
-        tone_alarm.click();
-
-        if (alarm.is_ringing()) {
-          stop_alarm();
-          return;
-        }
-
-        inactive_button.reset();
-
-        ALARM_EVENT_t alarm_data = clock.get_alarm_data();
-
-        alarm_data.enabled = !alarm_data.enabled;
-
-        if (alarm_data.enabled) {
-          alarm.activate();
-          alarm_toggle_state = ALARM_TOGGLE_STATE::TOGGLED_ON;
-        } else {
-          alarm.deactivate();
-          alarm_toggle_state = ALARM_TOGGLE_STATE::TOGGLED_OFF;
-        }
-
-        alarm_toggle_ival.reset();
-        alarm_toggle_ival.resume();
-
-        alarm.load_data(alarm_data);
-
-        clock.set_alarm_data(alarm_data);  // Update alarm data to nvram
-      }
-
-    } break;
-
-    case DISPLAY_STATE::SET_TIME: {
-      if (set_btn.pressed()) {
-        tone_alarm.click();
-
-        inactive_button.reset();
-
-        if (cursor == 1) {
-          cursor = 2;
-        } else {
-          current_display = DISPLAY_STATE::STANDBY;
-
-          call_set_time_interval.pause();
-          call_set_time_interval.reset();
-
-          clock.set_time();
-          clock.clear_additionals();
-
-          cursor = 0;
-        }
-      }
-
-      if (adjust_btn.pressed()) {
-        tone_alarm.click();
-
-        inactive_button.reset();
-
-        if (cursor == 1) {
-          clock.increment_minute();
-        } else if (cursor == 2) {
-          clock.increment_hour();
-        }
-      }
-
-      clock.temporary_clock(&time_to_disp);
-    } break;
-
-    case DISPLAY_STATE::SET_ALARM: {
-      ALARM_EVENT_t alarm_data = alarm.get_alarm_data();
-
-      if (set_btn.pressed()) {
-        tone_alarm.click();
-
-        inactive_button.reset();
-
-        if (cursor == 1) {
-          cursor = 2;
-        } else {
-          current_display = DISPLAY_STATE::STANDBY;
-          last_display = DISPLAY_STATE::SET_ALARM;
-
-          call_set_time_interval.pause();
-          call_set_time_interval.reset();
-
-          clock.set_alarm_data(alarm_data);
-
-          alarm.load_data(alarm_data);
-
-          alarm.clear_adjustments();
-
-          clock.alarm_is_set(true);
-
-          // check if the alarm is
-          // due or not
-          if (time.hour <= alarm_data.hour &&
-              time.minute <= alarm_data.minute) {
-            alarm.set_day(time.day);
-          } else {
-            alarm.set_day(time.day + 1);
-          }
-
-          cursor = 0;
-        }
-
-        set_btn.has_changed();
-      }
-
-      if (adjust_btn.pressed()) {
-        tone_alarm.click();
-
-        inactive_button.reset();
-
-        if (cursor == 1) {
-          alarm.increase_minute();
-        } else if (cursor == 2) {
-          alarm.increase_hour();
-        }
-      }
-
-      time_to_disp.hour = alarm_data.hour;
-      time_to_disp.minute = alarm_data.minute;
-
-    } break;
+    case DISPLAY_STATE::SET_ALARM:
+      handle_display_set_alarm();
+      break;
   }
 }
