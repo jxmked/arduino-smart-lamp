@@ -5,10 +5,10 @@
 
 #include "types.h"
 
-#define ALARM_NVRAM_ALARM_ENABLED 0x01
-#define ALARM_NVRAM_MINUTE 0x2
-#define ALARM_NVRAM_HOUR 0x3
-#define ALARM_NVRAM_ALARM_SET 0x4
+#define ALARM_NVRAM_ALARM_ENABLED 0
+#define ALARM_NVRAM_MINUTE 1
+#define ALARM_NVRAM_HOUR 2
+#define ALARM_NVRAM_ALARM_SET 3
 
 Clock::Clock() : ready_to_start(false), rtc(), additionals{0, 0, 0} {}
 

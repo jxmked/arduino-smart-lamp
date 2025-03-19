@@ -69,16 +69,20 @@ void Display::display_err(bool with_refresh) {
 }
 
 void Display::display_alarm_on() {
-  sevseg.setSegmentsDigit(0, 0x3F);
-  sevseg.setSegmentsDigit(1, 0x54);
+  sevseg.blank();
+
+  sevseg.setSegmentsDigit(1, 0x3F);
+  sevseg.setSegmentsDigit(2, 0x54);
 
   sevseg.refreshDisplay();
 }
 
 void Display::display_alarm_off() {
-  sevseg.setSegmentsDigit(0, 0x3F);
-  sevseg.setSegmentsDigit(1, 0x71);
+  sevseg.blank();
+
+  sevseg.setSegmentsDigit(1, 0x3F);
   sevseg.setSegmentsDigit(2, 0x71);
+  sevseg.setSegmentsDigit(3, 0x71);
 
   sevseg.refreshDisplay();
 }

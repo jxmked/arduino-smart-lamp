@@ -9,7 +9,6 @@
 #include "display/display.h"
 #include "display_state.h"
 #include "lamp.h"
-#include "program.h"
 #include "types.h"
 
 // Actual Time
@@ -39,16 +38,16 @@ Button touch_lamp(TOUCH_SENSOR_PIN);
 Button adjust_btn(BTN_ADJUST_PIN);
 Button set_btn(BTN_SET_PIN);
 
-Program prog;
+Lamp lamp = Lamp((float[LAMP_LED_BRIGHNESS_COUNT]){0.3, 1.0});
 
 uint8_t cursor = 0;
+DISPLAY_STATE current_display;
+DISPLAY_STATE last_display;
 
 void setup() {
   Serial.begin(9600);
 
   while (!Serial);
-
-  prog.begin();
 
   display.begin();
   clock.begin();
@@ -59,7 +58,7 @@ void setup() {
   }
 
   if (!clock.alarm_is_set()) {
-    ALARM_EVENT_t fresh_alarm_data = {6, 30, true};
+    ALARM_EVENT_t fresh_alarm_data = {6, 30, false};
 
     clock.set_alarm_data(fresh_alarm_data);
 
@@ -71,6 +70,9 @@ void setup() {
   alarm.begin();
   alarm.load_data(alarm_data);
 
+  lamp.begin();
+  lamp.update();
+
   touch_lamp.begin();
   set_btn.begin();
   adjust_btn.begin();
@@ -79,6 +81,9 @@ void setup() {
   call_set_time_interval.reset();
 
   alarm_toggle_state = ALARM_TOGGLE_STATE::NONE;
+
+  current_display = DISPLAY_STATE::STANDBY;
+  last_display = DISPLAY_STATE::STANDBY;
 }
 
 void loop() {
@@ -89,9 +94,8 @@ void loop() {
   time_to_disp = time;
 
   // INACTIVE EVENT
-  if (inactive_button.marked() &&
-      prog.current_display != DISPLAY_STATE::STANDBY) {
-    prog.current_display = DISPLAY_STATE::STANDBY;
+  if (inactive_button.marked() && current_display != DISPLAY_STATE::STANDBY) {
+    current_display = DISPLAY_STATE::STANDBY;
     clock.clear_additionals();
     alarm.clear_adjustments();
     cursor = 0;
@@ -110,8 +114,10 @@ void loop() {
     // than toggling the lamp lights
     if (alarm.is_ringing())
       alarm.snooze();
-    else
-      prog.handle_lamp_event();
+    else {
+      lamp.toggle_state();
+      lamp.update();
+    }
   }
   // END HANDLE LAMP
 
@@ -122,6 +128,7 @@ void loop() {
       alarm_toggle_ival.reset();
     }
 
+    // Blinking when alarm toggle to on/off
     if (blinking_ival.marked(500)) {
       if (alarm_toggle_state == ALARM_TOGGLE_STATE::TOGGLED_ON) {
         display.display_alarm_on();
@@ -136,7 +143,7 @@ void loop() {
     return;
   }
 
-  switch (prog.current_display) {
+  switch (current_display) {
     case DISPLAY_STATE::STANDBY: {
       cursor = 0;
 
@@ -156,7 +163,7 @@ void loop() {
           call_set_time_interval.reset();
 
           cursor = 1;
-          prog.handle_set_time_event();
+          current_display = DISPLAY_STATE::SET_TIME;
         }
       } else {
         call_set_time_interval.pause();
@@ -166,7 +173,8 @@ void loop() {
           inactive_button.reset();
 
           // Set alarm
-          prog.handle_set_alarm_event();
+          cursor = 1;
+          current_display = DISPLAY_STATE::SET_ALARM;
         }
       }
 
@@ -202,7 +210,7 @@ void loop() {
         if (cursor == 1) {
           cursor = 2;
         } else {
-          prog.standby();
+          current_display = DISPLAY_STATE::STANDBY;
 
           call_set_time_interval.pause();
           call_set_time_interval.reset();
@@ -236,16 +244,16 @@ void loop() {
         if (cursor == 1) {
           cursor = 2;
         } else {
-          prog.standby();
+          current_display = DISPLAY_STATE::STANDBY;
 
           call_set_time_interval.pause();
           call_set_time_interval.reset();
-          alarm.clear_adjustments();
 
           clock.set_alarm_data(alarm_data);
-
-          cursor = 0;
+          alarm.clear_adjustments();
         }
+
+        set_btn.has_changed();
       }
 
       if (adjust_btn.pressed()) {
@@ -256,12 +264,11 @@ void loop() {
         } else if (cursor == 2) {
           alarm.increase_hour();
         }
-
-        clock.set_alarm_data(alarm_data);
       }
 
-      TIME_t alarm_time = {0, alarm_data.minute, alarm_data.hour};
-      time_to_disp = alarm_time;
+      time_to_disp.hour = alarm_data.hour;
+      time_to_disp.minute = alarm_data.minute;
+
     } break;
   }
 
