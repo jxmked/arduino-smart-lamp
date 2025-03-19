@@ -9,6 +9,7 @@ class Tone {
   void begin(uint8_t _pin);
   void play();
   void stop();
+  void click();
 
  private:
   uint8_t pin;

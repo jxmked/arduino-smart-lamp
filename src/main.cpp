@@ -65,11 +65,13 @@ void setup() {
   }
 
   if (!clock.alarm_is_set()) {
+    // Set the build time as our current alarm
     const char* timeStr = __TIME__;
     uint8_t build_hour = (timeStr[0] - '0') * 10 + (timeStr[1] - '0');
-    uint8_t build_minute = (timeStr[3] - '0') * 10 + (timeStr[4] - '0');
+    uint8_t build_minute =
+        ((timeStr[3] - '0') * 10 + (timeStr[4] - '0') + 1) % 60;
 
-    ALARM_EVENT_t fresh_alarm_data = {build_hour, build_minute + 1, false};
+    ALARM_EVENT_t fresh_alarm_data = {build_hour, build_minute, false};
 
     clock.set_alarm_data(fresh_alarm_data);
 
@@ -119,9 +121,8 @@ void loop() {
 
   // Check if alarm is due
 
-  alarm.is_due();
-
-  if (alarm.is_ringing()) {
+  if (alarm.is_due() || alarm.is_ringing()) {
+    cursor = 3;
     tone_alarm.play();
   }
 
@@ -178,10 +179,10 @@ void loop() {
 }
 
 static void stop_alarm(void) {
-  if (alarm.is_ringing()) {
-    alarm.snooze();
-    tone_alarm.stop();
-  }
+  alarm.snooze();
+  tone_alarm.stop();
+
+  cursor = 0;
 }
 
 static void display_switch(void) {
@@ -192,6 +193,7 @@ static void display_switch(void) {
       if (set_btn.read() == Button::PRESSED) {
         if (alarm.is_ringing()) {
           stop_alarm();
+          set_btn.has_changed();
           return;
         }
 
@@ -206,6 +208,9 @@ static void display_switch(void) {
         set_btn.has_changed();  // clear change state
 
         if (call_set_time_interval.marked()) {
+          tone_alarm.click();
+          inactive_button.reset();
+
           call_set_time_interval.pause();
           call_set_time_interval.reset();
 
@@ -217,6 +222,8 @@ static void display_switch(void) {
         call_set_time_interval.reset();
 
         if (set_btn.has_changed() && last_display != DISPLAY_STATE::SET_ALARM) {
+          tone_alarm.click();
+
           inactive_button.reset();
 
           // Set alarm
@@ -230,6 +237,8 @@ static void display_switch(void) {
       // Standby mode - adjust event
       // toggle alarm on/off
       if (adjust_btn.pressed()) {
+        tone_alarm.click();
+
         if (alarm.is_ringing()) {
           stop_alarm();
           return;
@@ -261,6 +270,8 @@ static void display_switch(void) {
 
     case DISPLAY_STATE::SET_TIME: {
       if (set_btn.pressed()) {
+        tone_alarm.click();
+
         inactive_button.reset();
 
         if (cursor == 1) {
@@ -279,6 +290,8 @@ static void display_switch(void) {
       }
 
       if (adjust_btn.pressed()) {
+        tone_alarm.click();
+
         inactive_button.reset();
 
         if (cursor == 1) {
@@ -295,6 +308,8 @@ static void display_switch(void) {
       ALARM_EVENT_t alarm_data = alarm.get_alarm_data();
 
       if (set_btn.pressed()) {
+        tone_alarm.click();
+
         inactive_button.reset();
 
         if (cursor == 1) {
@@ -314,6 +329,15 @@ static void display_switch(void) {
 
           clock.alarm_is_set(true);
 
+          // check if the alarm is
+          // due or not
+          if (time.hour <= alarm_data.hour &&
+              time.minute <= alarm_data.minute) {
+            alarm.set_day(time.day);
+          } else {
+            alarm.set_day(time.day + 1);
+          }
+
           cursor = 0;
         }
 
@@ -321,6 +345,8 @@ static void display_switch(void) {
       }
 
       if (adjust_btn.pressed()) {
+        tone_alarm.click();
+
         inactive_button.reset();
 
         if (cursor == 1) {
