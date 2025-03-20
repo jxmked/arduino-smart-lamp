@@ -45,7 +45,7 @@ Display display;
 Clock clock;
 Alarm alarm;
 
-Button touch_lamp(TOUCH_SENSOR_PIN);
+Button touch_lamp(TOUCH_SENSOR_PIN, 100, true);
 Button adjust_btn(BTN_ADJUST_PIN);
 Button set_btn(BTN_SET_PIN);
 
@@ -202,7 +202,7 @@ static void stop_alarm(void) {
 }
 
 static void handle_display_standby() {
-  if (set_btn.read() == Button::PRESSED) {
+  if (set_btn.read() == set_btn.PRESSED) {
     if (alarm.is_ringing()) {
       stop_alarm();
       set_btn.has_changed();
